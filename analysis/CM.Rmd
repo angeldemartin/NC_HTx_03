@@ -1,0 +1,631 @@
+---
+title: "CM"
+author: "A.DeMartin"
+date: "2025-06-13"
+output: 
+  html_document:
+    keep_md: true
+    toc: true
+editor_options: 
+  chunk_output_type: inline
+---
+
+```{r setup, echo = FALSE}
+options(width = 100)
+knitr::opts_chunk$set(warning = FALSE, message = FALSE, dev = c("png", "pdf"))
+seed <- 1234
+```
+
+```{r}
+library(here)
+library(tximeta)
+library(DESeq2)
+library(vsn)
+library(pheatmap)
+library(RColorBrewer)
+library(biomaRt)
+library(tidyverse)
+library(msigdbr)
+library(clusterProfiler)
+library(ggpubr)
+library(EnhancedVolcano)
+```
+
+```{r}
+basedir <- "/Users/immbio/Desktop/Project/Angelina/NC_HTx_03/data/"
+```
+
+## load data and create a SummarizedExperiment
+```{r, eval=TRUE, include=TRUE}
+target_folder <- file.path(basedir, "Ref/quants/CM")
+folders <- list.dirs(path = target_folder, full.names = TRUE, recursive = FALSE)
+folder_names <- basename(folders)
+
+coldata <- data.frame(names = folder_names)
+
+coldata$files <- file.path(paste0(folders), "quant.sf")
+
+file.exists(coldata$files)
+se <- tximeta(coldata)
+
+dim(se)
+
+head(rownames(se))
+gse <- summarizeToGene(se)
+
+dim(gse)
+head(rownames(gse))
+
+gse@assays
+assayNames(gse)
+
+coldata$names
+```
+
+### add metadata
+```{r add meta, eval=TRUE, include=TRUE}
+#assign stimulation condition
+colData(gse)$stim <- "stim"
+colData(gse)$stim[grepl("BMP4_50_24h", colData(gse)$names)] <- "BMP_50"
+colData(gse)$stim[grepl("BMP4_500_24h", colData(gse)$names)] <- "BMP_500"
+colData(gse)$stim[grepl("HGF_50_24h", colData(gse)$names)] <- "HGF_50"
+colData(gse)$stim[grepl("HGF_500_24h", colData(gse)$names)] <- "HGF_500"
+colData(gse)$stim[grepl("MFAP5_50_24h", colData(gse)$names)] <- "MFAP5_50"
+colData(gse)$stim[grepl("MFAP5_200_24h", colData(gse)$names)] <- "MFAP5_200"
+colData(gse)$stim[grepl("FCS_24h", colData(gse)$names)] <- "FCS"
+colData(gse)$stim[grepl("BSA_24h", colData(gse)$names)] <- "BSA"
+table(colData(gse)$stim)
+colData(gse)$stim <- as.factor(colData(gse)$stim)
+
+colData(gse)$stim2 <- "stim2"
+colData(gse)$stim2[grepl("FCS|BSA", colData(gse)$names)] <- "ctr"
+colData(gse)$stim2[grepl("BMP", colData(gse)$names)] <- "BMP"
+colData(gse)$stim2[grepl("HGF", colData(gse)$names)] <- "HGF"
+colData(gse)$stim2[grepl("MFAP5", colData(gse)$names)] <- "MFAP5"
+table(colData(gse)$stim2)
+colData(gse)$stim2 <- as.factor(colData(gse)$stim2)
+
+#assign patient code
+colData(gse)$pc <- "pc"
+colData(gse)$pc[grepl("CM14", colData(gse)$names)] <- "CM14"
+colData(gse)$pc[grepl("CM15", colData(gse)$names)] <- "CM15"
+table(colData(gse)$pc)
+colData(gse)$pc <- as.factor(colData(gse)$pc)
+
+saveRDS(gse, file=paste0(basedir, "gse_stimhiPS.rds"))
+```
+
+```{r, eval=TRUE, include=TRUE}
+gse <- readRDS(file=paste0(basedir, "gse_stimhiPS.rds"))
+```
+
+## sample distance
+### construct a DESeqDataSet stim
+```{r construct DESeqDataSet object stim2}
+##construct a DESeqDataSet object
+#dds <- DESeqDataSet(gse, design = ~ cell + dex)
+dds <- DESeqDataSet(gse, design = ~ stim2)
+
+## pre-filtering
+nrow(dds)
+smallestGroupSize <- 2
+keep <- rowSums(counts(dds) >= 10) >= smallestGroupSize
+dds <- dds[keep,]
+nrow(dds)
+
+## variance stabilizing transformation
+lambda <- 10^seq(from = -1, to = 2, length = 1000)
+cts <- matrix(rpois(1000*100, lambda), ncol = 100)
+meanSdPlot(cts, ranks = FALSE)
+
+log.cts.one <- log2(cts + 1)
+meanSdPlot(log.cts.one, ranks = FALSE)
+
+vsd <- vst(dds, blind = FALSE)
+rld <- rlog(dds, blind = FALSE)
+
+dds <- estimateSizeFactors(dds)
+
+##RNA-seq counts, however, the expected variance grows with the mean
+df <- bind_rows(
+  as_data_frame(log2(counts(dds, normalized=TRUE)[, 1:2]+1)) %>%
+         mutate(transformation = "log2(x + 1)"),
+  as_data_frame(assay(vsd)[, 1:2]) %>% mutate(transformation = "vst"),
+  as_data_frame(assay(rld)[, 1:2]) %>% mutate(transformation = "rlog"))
+  
+colnames(df)[1:2] <- c("x", "y")  
+
+lvls <- c("log2(x + 1)", "vst", "rlog")
+df$transformation <- factor(df$transformation, levels=lvls)
+
+ggplot(df, aes(x = x, y = y)) + geom_hex(bins = 80) +
+  coord_fixed() + facet_grid( . ~ transformation)  
+```
+
+### sample distance
+```{r distance, include=FALSE, eval=TRUE, echo=TRUE}
+sampleDists <- dist(t(assay(rld)))
+sampleDists
+```
+
+### distance heatmap
+```{r distance heatmap}
+sampleDistMatrix <- as.matrix( sampleDists )
+rownames(sampleDistMatrix) <- paste(rld$stim, rld$pc, sep = " - " )
+colnames(sampleDistMatrix) <- NULL
+colors <- colorRampPalette(rev(brewer.pal(9, "BuPu")) )(255)
+pheatmap(sampleDistMatrix,
+         clustering_distance_rows = sampleDists,
+         clustering_distance_cols = sampleDists,
+         col = colors)
+
+colors <- colorRampPalette(rev(brewer.pal(9, "Blues")) )(255)
+pheatmap(sampleDistMatrix,
+         clustering_distance_rows = sampleDists,
+         clustering_distance_cols = sampleDists,
+         col = colors)
+```
+
+### distance MDS
+```{r vis dim red bulk}
+colCond <- c("#213782","#822145","#f4a582","#8c510a","#B45B5C","#725663FF","grey","lightgrey")
+names(colCond) <- c("BMP_50", "BMP_500", "HGF_50", "HGF_500", "MFAP5_50", "MFAP5_200","FCS", "BSA")
+
+colpc <- c("#ABDDA4","#779d8d")
+names(colpc) <- c("CM14","CM15")
+
+#plotPCA(rld, intgroup = c("cond", "grp"))
+plotPCA(rld, intgroup = c("stim", "pc")) +
+  geom_point(aes(color = stim), size = 8, alpha = 0.8) +
+  scale_color_manual(values = colCond) # size = dot size, alpha = transparency
+
+mds <- as.data.frame(colData(rld))  %>%
+         cbind(cmdscale(sampleDistMatrix))
+ggplot(mds, aes(x = `1`, y = `2`, color = stim, shape = pc)) +
+  geom_point(size = 4, alpha = 0.8) +
+  scale_color_manual(values = colCond) +
+  geom_point(size = 4) + coord_fixed() + ggtitle("MDS with rld data")
+```
+
+## BMP vs ctr
+### diff expressed in BMP4 vs ctr
+```{r}
+dds <- DESeq(dds)
+res <- results(dds, contrast = c("stim2", "BMP", "ctr")) ## define which conditions to contrast
+#res <- results(dds)
+res
+
+genes <- data.frame(ensID=rownames(res))
+mart <- useDataset("hsapiens_gene_ensembl", useMart("ensembl"))
+
+G_list <- getBM(attributes=c('hgnc_symbol', 'ensembl_gene_id'), 
+      filters = 'ensembl_gene_id', 
+      values = genes$ensID, 
+      mart = mart)
+
+resDat <- data.frame(res@listData) %>% mutate(ensembl_gene_id = rownames(res)) %>% 
+  left_join(., G_list, by= "ensembl_gene_id")
+```
+
+### top 50 heatmap
+```{r top 50 BMP vs ctr heatmap, fig.height=12, fig.width=6}
+colCond2 <- c("#355C7D","#f4a582","#B45B5C","#A59C94")
+names(colCond2) <- c("BMP","HGF","MFAP5","ctr")
+
+topGenes <- head(order(res$padj),50)
+#topGenes <- resDat$ensembl_gene_id[which(resDat$padj < 0.01)]
+
+mat  <- assay(rld)[ topGenes, ]
+namesDat <- data.frame(ensembl_gene_id = rownames(mat)) %>%
+  left_join(., G_list, by= "ensembl_gene_id")
+
+# Define annotation colors
+ann_colors <- list(
+  stim2 = colCond2,
+  pc = colpc,
+  stim = colCond)
+
+anno <- as.data.frame(colData(rld)[, c("stim2", "stim" ,"pc")])
+
+# custom heatmap colors
+heat_colors <- colorRampPalette(c("#2166AC", "#F7F7F7", "#B2182B"))(50)
+
+pheatmap(mat, annotation_col = anno, annotation_colors = ann_colors, scale = "row",
+         labels_row = namesDat$hgnc_symbol, color = heat_colors, labels_col = rep("", ncol(mat)))
+```
+
+### top 100 heatmap
+```{r top 100 BMP vs ctr heatmap, fig.height=18, fig.width=6}
+topGenes <- head(order(res$padj),100)
+#topGenes <- resDat$ensembl_gene_id[which(resDat$padj < 0.01)]
+
+mat  <- assay(rld)[ topGenes, ]
+namesDat <- data.frame(ensembl_gene_id = rownames(mat)) %>%
+  left_join(., G_list, by= "ensembl_gene_id")
+
+# Define annotation colors
+ann_colors <- list(
+  stim2 = colCond2,
+  pc = colpc,
+  stim = colCond)
+
+anno <- as.data.frame(colData(rld)[, c("stim2", "stim" ,"pc")])
+
+# custom heatmap colors
+heat_colors <- colorRampPalette(c("#2166AC", "#F7F7F7", "#B2182B"))(50)
+
+pheatmap(mat, annotation_col = anno, annotation_colors = ann_colors, scale = "row",
+         labels_row = namesDat$hgnc_symbol, color = heat_colors, labels_col = rep("", ncol(mat)))
+```
+
+### vulcano
+```{r vulcano BMP vs ctr, fig.height=10, fig.width=13}
+res$symbol <- resDat$hgnc_symbol
+EnhancedVolcano(res,
+    lab = res$symbol,
+    x = 'log2FoldChange',
+    y = 'pvalue',
+    xlim = c(-10, 10),
+    #ylim = c(0,50),
+    pCutoff = 10e-05,
+    FCcutoff = 1,
+    title = "DeSEQ2 results",
+    subtitle = bquote(italic("BMP4 vs ctr")))
+```
+
+### pathway analysis
+```{r pathway anaysis BMP vs ctr, fig.height=8, fig.width=10}
+rankedGenes <- resDat %>%
+  filter(!is.na(ensembl_gene_id)) %>%
+  mutate(rank = log2FoldChange) %>%
+  arrange(desc(rank)) %>%
+  pull(rank, ensembl_gene_id)
+
+head(rankedGenes)
+
+rankedGenes <- resDat %>%
+  filter(!is.na(ensembl_gene_id)) %>%
+  mutate(rank = -log10({pvalue}) * sign({log2FoldChange})) %>%
+  filter(!is.na(rank)) %>% 
+  arrange(desc(rank)) %>%
+  pull(rank, ensembl_gene_id)
+
+head(rankedGenes)
+
+
+term2gene <- msigdbr(species = "Homo sapiens", category = "H") %>% 
+  dplyr::select(gs_name, ensembl_gene)
+term2name <- msigdbr(species = "Homo sapiens", category = "H") %>% 
+  dplyr::select(gs_name, gs_description) %>% 
+  distinct()
+
+gseaRes <- GSEA(rankedGenes,
+                TERM2GENE = term2gene,
+                TERM2NAME = term2name,
+                pvalueCutoff = 1.00, 
+                minGSSize = 5,
+                maxGSSize = 500)
+
+gseaResDat <- gseaRes@result
+
+as_tibble(gseaRes) %>% 
+  arrange(desc(abs(NES))) %>% 
+  top_n(20, wt=-p.adjust) %>% 
+  dplyr::select(-core_enrichment) %>%
+  mutate(across(c("enrichmentScore", "NES"), round, digits=3)) %>% 
+  mutate(across(c("pvalue", "p.adjust", "qvalue"), scales::scientific))
+```
+
+```{r pathway anaysis BMP vs ctr-2, fig.height=15, fig.width=10}
+dotplot(gseaRes, showCategory=10, split=".sign") + facet_grid(.~.sign)
+```
+
+```{r pathway anaysis BMP vs ctr-3, fig.height=5, fig.width=10}
+selGODat <- gseaResDat %>% 
+  arrange(desc(abs(NES))) %>% 
+  top_n(20, wt=-p.adjust) %>% 
+  mutate(qscore=-log(p.adjust, base=10)) %>% 
+  mutate(cluster="BMP")
+
+p <- ggbarplot(selGODat, x = "ID", y = "qscore",
+          fill = "cluster",               
+          color = "cluster",            
+          palette = colCond2,            
+          sort.val = "asc",           
+          sort.by.groups = TRUE      
+          #x.text.angle = 90           
+          ) + 
+  rotate()
+p
+```
+
+## HGF vs ctr
+### diff expressed in HGF vs ctr
+```{r}
+dds <- DESeq(dds)
+res <- results(dds, contrast = c("stim2", "HGF", "ctr")) ## define which conditions to contrast
+#res <- results(dds)
+res
+
+genes <- data.frame(ensID=rownames(res))
+mart <- useDataset("hsapiens_gene_ensembl", useMart("ensembl"))
+
+G_list <- getBM(attributes=c('hgnc_symbol', 'ensembl_gene_id'), 
+      filters = 'ensembl_gene_id', 
+      values = genes$ensID, 
+      mart = mart)
+
+resDat <- data.frame(res@listData) %>% mutate(ensembl_gene_id = rownames(res)) %>% 
+  left_join(., G_list, by= "ensembl_gene_id")
+```
+
+### top 50 heatmap
+```{r top 50 HGF vs ctr heatmap, fig.height=12, fig.width=6}
+
+topGenes <- head(order(res$padj),50)
+#topGenes <- resDat$ensembl_gene_id[which(resDat$padj < 0.01)]
+
+mat  <- assay(rld)[ topGenes, ]
+namesDat <- data.frame(ensembl_gene_id = rownames(mat)) %>%
+  left_join(., G_list, by= "ensembl_gene_id")
+
+# Define annotation colors
+ann_colors <- list(
+  stim2 = colCond2,
+  pc = colpc,
+  stim = colCond)
+
+anno <- as.data.frame(colData(rld)[, c("stim2", "stim" ,"pc")])
+
+# custom heatmap colors
+heat_colors <- colorRampPalette(c("#2166AC", "#F7F7F7", "#B2182B"))(50)
+
+pheatmap(mat, annotation_col = anno, annotation_colors = ann_colors, scale = "row",
+         labels_row = namesDat$hgnc_symbol, color = heat_colors, labels_col = rep("", ncol(mat)))
+```
+
+### top 100 heatmap
+```{r top 100 HGF vs ctr heatmap, fig.height=18, fig.width=6}
+topGenes <- head(order(res$padj),100)
+#topGenes <- resDat$ensembl_gene_id[which(resDat$padj < 0.01)]
+
+mat  <- assay(rld)[ topGenes, ]
+namesDat <- data.frame(ensembl_gene_id = rownames(mat)) %>%
+  left_join(., G_list, by= "ensembl_gene_id")
+
+# Define annotation colors
+ann_colors <- list(
+  stim2 = colCond2,
+  pc = colpc,
+  stim = colCond)
+
+anno <- as.data.frame(colData(rld)[, c("stim2", "stim" ,"pc")])
+
+# custom heatmap colors
+heat_colors <- colorRampPalette(c("#2166AC", "#F7F7F7", "#B2182B"))(50)
+
+pheatmap(mat, annotation_col = anno, annotation_colors = ann_colors, scale = "row",
+         labels_row = namesDat$hgnc_symbol, color = heat_colors, labels_col = rep("", ncol(mat)))
+```
+
+### vulcano
+```{r vulcano HGF vs ctr, fig.height=10, fig.width=13}
+res$symbol <- resDat$hgnc_symbol
+EnhancedVolcano(res,
+    lab = res$symbol,
+    x = 'log2FoldChange',
+    y = 'pvalue',
+    xlim = c(-10, 10),
+    ylim = c(0,20),
+    pCutoff = 10e-05,
+    FCcutoff = 1,
+    title = "DeSEQ2 results",
+    subtitle = bquote(italic("HGF vs ctr")))
+```
+
+## MFAF5 vs ctr
+### diff expressed in MFAP5 vs ctr
+```{r}
+dds <- DESeq(dds)
+res <- results(dds, contrast = c("stim2", "MFAP5", "ctr")) ## define which conditions to contrast
+#res <- results(dds)
+res
+
+genes <- data.frame(ensID=rownames(res))
+mart <- useDataset("hsapiens_gene_ensembl", useMart("ensembl"))
+
+G_list <- getBM(attributes=c('hgnc_symbol', 'ensembl_gene_id'), 
+      filters = 'ensembl_gene_id', 
+      values = genes$ensID, 
+      mart = mart)
+
+resDat <- data.frame(res@listData) %>% mutate(ensembl_gene_id = rownames(res)) %>% 
+  left_join(., G_list, by= "ensembl_gene_id")
+```
+
+### top 50 heatmap
+```{r top 50 MFAP5 vs ctr heatmap, fig.height=12, fig.width=6}
+topGenes <- head(order(res$padj),50)
+#topGenes <- resDat$ensembl_gene_id[which(resDat$padj < 0.01)]
+
+mat  <- assay(rld)[ topGenes, ]
+namesDat <- data.frame(ensembl_gene_id = rownames(mat)) %>%
+  left_join(., G_list, by= "ensembl_gene_id")
+
+# Define annotation colors
+ann_colors <- list(
+  stim2 = colCond2,
+  pc = colpc,
+  stim = colCond)
+
+anno <- as.data.frame(colData(rld)[, c("stim2", "stim" ,"pc")])
+
+# custom heatmap colors
+heat_colors <- colorRampPalette(c("#2166AC", "#F7F7F7", "#B2182B"))(50)
+
+pheatmap(mat, annotation_col = anno, annotation_colors = ann_colors, scale = "row",
+         labels_row = namesDat$hgnc_symbol, color = heat_colors, labels_col = rep("", ncol(mat)))
+```
+
+### top 100 heatmap
+```{r top 100 MFAP5 vs ctr heatmap, fig.height=18, fig.width=6}
+topGenes <- head(order(res$padj),100)
+#topGenes <- resDat$ensembl_gene_id[which(resDat$padj < 0.01)]
+
+mat  <- assay(rld)[ topGenes, ]
+namesDat <- data.frame(ensembl_gene_id = rownames(mat)) %>%
+  left_join(., G_list, by= "ensembl_gene_id")
+
+# Define annotation colors
+ann_colors <- list(
+  stim2 = colCond2,
+  pc = colpc,
+  stim = colCond)
+
+anno <- as.data.frame(colData(rld)[, c("stim2", "stim" ,"pc")])
+
+# custom heatmap colors
+heat_colors <- colorRampPalette(c("#2166AC", "#F7F7F7", "#B2182B"))(50)
+
+pheatmap(mat, annotation_col = anno, annotation_colors = ann_colors, scale = "row",
+         labels_row = namesDat$hgnc_symbol, color = heat_colors, labels_col = rep("", ncol(mat)))
+```
+
+### vulcano
+```{r vulcano MFAP5 vs ctr, fig.height=10, fig.width=13}
+res$symbol <- resDat$hgnc_symbol
+resdf <- as.data.frame(res)
+EnhancedVolcano(res,
+    lab = res$symbol,
+    x = 'log2FoldChange',
+    y = 'pvalue',
+    xlim = c(-10, 10),
+    ylim = c(0,12),
+    pCutoff = 10e-05,
+    FCcutoff = 1,
+    title = "DeSEQ2 results",
+    subtitle = bquote(italic("MFAP5 vs ctr")))
+```
+
+
+## BMP_50 vs BMP_500
+### construct a DESeqDataSet stim
+```{r construct DESeqDataSet object stim}
+##construct a DESeqDataSet object
+#dds <- DESeqDataSet(gse, design = ~ cell + dex)
+dds <- DESeqDataSet(gse, design = ~ stim)
+
+## pre-filtering
+nrow(dds)
+smallestGroupSize <- 2
+keep <- rowSums(counts(dds) >= 10) >= smallestGroupSize
+dds <- dds[keep,]
+nrow(dds)
+
+## variance stabilizing transformation
+lambda <- 10^seq(from = -1, to = 2, length = 1000)
+cts <- matrix(rpois(1000*100, lambda), ncol = 100)
+meanSdPlot(cts, ranks = FALSE)
+
+log.cts.one <- log2(cts + 1)
+meanSdPlot(log.cts.one, ranks = FALSE)
+
+vsd <- vst(dds, blind = FALSE)
+rld <- rlog(dds, blind = FALSE)
+
+dds <- estimateSizeFactors(dds)
+
+##RNA-seq counts, however, the expected variance grows with the mean
+df <- bind_rows(
+  as_data_frame(log2(counts(dds, normalized=TRUE)[, 1:2]+1)) %>%
+         mutate(transformation = "log2(x + 1)"),
+  as_data_frame(assay(vsd)[, 1:2]) %>% mutate(transformation = "vst"),
+  as_data_frame(assay(rld)[, 1:2]) %>% mutate(transformation = "rlog"))
+  
+colnames(df)[1:2] <- c("x", "y")  
+
+lvls <- c("log2(x + 1)", "vst", "rlog")
+df$transformation <- factor(df$transformation, levels=lvls)
+
+ggplot(df, aes(x = x, y = y)) + geom_hex(bins = 80) +
+  coord_fixed() + facet_grid( . ~ transformation)  
+```
+
+### diff expressed in BMP_50 vs BMP_500
+```{r}
+dds <- DESeq(dds)
+res <- results(dds, contrast = c("stim", "BMP_50", "BMP_500")) ## define which conditions to contrast
+#res <- results(dds)
+res
+
+genes <- data.frame(ensID=rownames(res))
+mart <- useDataset("hsapiens_gene_ensembl", useMart("ensembl"))
+
+G_list <- getBM(attributes=c('hgnc_symbol', 'ensembl_gene_id'), 
+      filters = 'ensembl_gene_id', 
+      values = genes$ensID, 
+      mart = mart)
+
+resDat <- data.frame(res@listData) %>% mutate(ensembl_gene_id = rownames(res)) %>% 
+  left_join(., G_list, by= "ensembl_gene_id")
+```
+
+### top 50 heatmap
+```{r top 50 BMP_50 vs BMP_500 heatmap, fig.height=12, fig.width=6}
+topGenes <- head(order(res$padj),50)
+#topGenes <- resDat$ensembl_gene_id[which(resDat$padj < 0.01)]
+
+mat  <- assay(rld)[ topGenes, ]
+namesDat <- data.frame(ensembl_gene_id = rownames(mat)) %>%
+  left_join(., G_list, by= "ensembl_gene_id")
+
+# Define annotation colors
+ann_colors <- list(
+  stim2 = colCond2,
+  pc = colpc,
+  stim = colCond)
+
+anno <- as.data.frame(colData(rld)[, c("stim2", "stim" ,"pc")])
+
+# custom heatmap colors
+heat_colors <- colorRampPalette(c("#2166AC", "#F7F7F7", "#B2182B"))(50)
+
+pheatmap(mat, annotation_col = anno, annotation_colors = ann_colors, scale = "row",
+         labels_row = namesDat$hgnc_symbol, color = heat_colors, labels_col = rep("", ncol(mat)))
+```
+
+### vulcano
+```{r vulcano BMP_50 vs BMP_500, fig.height=10, fig.width=13}
+res$symbol <- resDat$hgnc_symbol
+EnhancedVolcano(res,
+    lab = res$symbol,
+    x = 'log2FoldChange',
+    y = 'pvalue',
+    xlim = c(-10, 10),
+    ylim = c(0,10),
+    pCutoff = 10e-05,
+    FCcutoff = 1,
+    title = "DeSEQ2 results",
+    subtitle = bquote(italic("BMP_50 vs BMP_500")))
+```
+
+## plot selected genes
+### indiv counts
+```{r sel genes, fig.height=4, fig.width=6}
+colCond2 <- c("#355C7D","#A59C94","#f4a582","#B45B5C")
+names(colCond2) <- c("BMP","ctr","HGF","MFAP5")
+
+sel_genes <- c("ENSG00000125378", "ENSG00000107779", "ENSG00000138696", "ENSG00000180875", "ENSG00000105976", "ENSG00000197614")
+
+for(ID in sel_genes){
+  symbol <- G_list$hgnc_symbol[which(G_list$ensembl_gene_id == ID)]
+  plotCounts(dds, gene = ID, intgroup=c("stim2"), main = symbol, col=colCond2[factor(dds$stim2)],
+             pch = 19)
+}
+```
+
+## session info
+```{r session info}
+sessionInfo()
+date()
+```

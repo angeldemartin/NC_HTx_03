@@ -1,0 +1,1710 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+<meta name="author" content="A.DeMartin" />
+
+<meta name="date" content="2025-06-13" />
+
+<title>CF</title>
+
+<script src="site_libs/header-attrs-2.29/header-attrs.js"></script>
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/jqueryui-1.13.2/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+
+<link rel="icon" href="https://github.com/workflowr/workflowr-assets/raw/main/img/reproducible.png">
+<!-- Add a small amount of space between sections. -->
+<style type="text/css">
+div.section {
+  padding-top: 12px;
+}
+</style>
+
+
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+details > summary > p:only-child {
+  display: inline;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark the anchor link active (and if it's in a dropdown, also mark that active)
+  var dropdown = menuAnchor.closest('li.dropdown');
+  if (window.bootstrap) { // Bootstrap 4+
+    menuAnchor.addClass('active');
+    dropdown.find('> .dropdown-toggle').addClass('active');
+  } else { // Bootstrap 3
+    menuAnchor.parent().addClass('active');
+    dropdown.addClass('active');
+  }
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before, .tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "\e259";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "\e258";
+  font-family: 'Glyphicons Halflings';
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-bs-toggle="collapse" data-target="#navbar" data-bs-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">NC_HTx_03</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li>
+  <a href="about.html">About</a>
+</li>
+<li>
+  <a href="license.html">License</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+
+
+<h1 class="title toc-ignore">CF</h1>
+<h4 class="author">A.DeMartin</h4>
+<h4 class="date">2025-06-13</h4>
+
+</div>
+
+
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-report" data-toggle="collapse" data-target="#workflowr-report">
+<span class="glyphicon glyphicon-list" aria-hidden="true"></span>
+workflowr <span class="glyphicon glyphicon-exclamation-sign text-danger"
+aria-hidden="true"></span>
+</button>
+</p>
+<div id="workflowr-report" class="collapse">
+<ul class="nav nav-tabs">
+<li class="active">
+<a data-toggle="tab" href="#summary">Summary</a>
+</li>
+<li>
+<a data-toggle="tab" href="#checks"> Checks <span
+class="glyphicon glyphicon-exclamation-sign text-danger"
+aria-hidden="true"></span> </a>
+</li>
+<li>
+<a data-toggle="tab" href="#versions">Past versions</a>
+</li>
+</ul>
+<div class="tab-content">
+<div id="summary" class="tab-pane fade in active">
+<p>
+<strong>Last updated:</strong> 2025-06-13
+</p>
+<p>
+<strong>Checks:</strong> <span
+class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 5
+<span class="glyphicon glyphicon-exclamation-sign text-danger"
+aria-hidden="true"></span> 2
+</p>
+<p>
+<strong>Knit directory:</strong> <code>NC_HTx_03/</code> <span
+class="glyphicon glyphicon-question-sign" aria-hidden="true"
+title="This is the local directory in which the code in this file was executed.">
+</span>
+</p>
+<p>
+This reproducible <a href="https://rmarkdown.rstudio.com">R Markdown</a>
+analysis was created with <a
+  href="https://github.com/workflowr/workflowr">workflowr</a> (version
+1.7.1). The <em>Checks</em> tab describes the reproducibility checks
+that were applied when the results were created. The <em>Past
+versions</em> tab lists the development history.
+</p>
+<hr>
+</div>
+<div id="checks" class="tab-pane fade">
+<div id="workflowr-checks" class="panel-group">
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRMarkdownfilestronguncommittedchanges">
+<span class="glyphicon glyphicon-exclamation-sign text-danger"
+aria-hidden="true"></span> <strong>R Markdown file:</strong> uncommitted
+changes </a>
+</p>
+</div>
+<div id="strongRMarkdownfilestronguncommittedchanges"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>The R Markdown is untracked by Git. To know which version of the R
+Markdown file created these results, you’ll want to first commit it to
+the Git repo. If you’re still working on the analysis, you can ignore
+this warning. When you’re finished, you can run
+<code>wflow_publish</code> to commit the R Markdown file and build the
+HTML.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongEnvironmentstrongempty">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Environment:</strong> empty </a>
+</p>
+</div>
+<div id="strongEnvironmentstrongempty" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! The global environment was empty. Objects defined in the
+global environment can affect the analysis in your R Markdown file in
+unknown ways. For reproduciblity it’s best to always run the code in an
+empty environment.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSeedstrongcodesetseed20250611code">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Seed:</strong>
+<code>set.seed(20250611)</code> </a>
+</p>
+</div>
+<div id="strongSeedstrongcodesetseed20250611code"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>The command <code>set.seed(20250611)</code> was run prior to running
+the code in the R Markdown file. Setting a seed ensures that any results
+that rely on randomness, e.g. subsampling or permutations, are
+reproducible.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSessioninformationstrongrecorded">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Session information:</strong>
+recorded </a>
+</p>
+</div>
+<div id="strongSessioninformationstrongrecorded"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! Recording the operating system, R version, and package
+versions is critical for reproducibility.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongCachestrongnone">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Cache:</strong> none </a>
+</p>
+</div>
+<div id="strongCachestrongnone" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Nice! There were no cached chunks for this analysis, so you can be
+confident that you successfully produced the results during this
+run.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongFilepathsstrongabsolute">
+<span class="glyphicon glyphicon-exclamation-sign text-danger"
+aria-hidden="true"></span> <strong>File paths:</strong> absolute </a>
+</p>
+</div>
+<div id="strongFilepathsstrongabsolute" class="panel-collapse collapse">
+<div class="panel-body">
+<p>
+Using absolute paths to the files within your workflowr project makes it
+difficult for you and others to run your code on a different machine.
+Change the absolute path(s) below to the suggested relative path(s) to
+make your code more reproducible.
+</p>
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th style="text-align:left;">
+absolute
+</th>
+<th style="text-align:left;">
+relative
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+/Users/immbio/Desktop/Project/Angelina/NC_HTx_03/data/
+</td>
+<td style="text-align:left;">
+data
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomangeldemartinNCHTx03tree2972c2945f0b0e5f920a2084ac8af2a56eb4d4abtargetblank2972c29a">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Repository version:</strong>
+<a href="https://github.com/angeldemartin/NC_HTx_03/tree/2972c2945f0b0e5f920a2084ac8af2a56eb4d4ab" target="_blank">2972c29</a>
+</a>
+</p>
+</div>
+<div
+id="strongRepositoryversionstrongahrefhttpsgithubcomangeldemartinNCHTx03tree2972c2945f0b0e5f920a2084ac8af2a56eb4d4abtargetblank2972c29a"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>
+Great! You are using Git for version control. Tracking code development
+and connecting the code version to the results is critical for
+reproducibility.
+</p>
+<p>
+The results in this page were generated with repository version
+<a href="https://github.com/angeldemartin/NC_HTx_03/tree/2972c2945f0b0e5f920a2084ac8af2a56eb4d4ab" target="_blank">2972c29</a>.
+See the <em>Past versions</em> tab to see a history of the changes made
+to the R Markdown and HTML files.
+</p>
+<p>
+Note that you need to be careful to ensure that all relevant files for
+the analysis have been committed to Git prior to generating the results
+(you can use <code>wflow_publish</code> or
+<code>wflow_git_commit</code>). workflowr only checks the R Markdown
+file, but you know if there are other scripts or data files that it
+depends on. Below is the status of the Git repository when the results
+were generated:
+</p>
+<pre><code>
+Ignored files:
+    Ignored:    .DS_Store
+    Ignored:    .Rhistory
+    Ignored:    .Rproj.user/
+    Ignored:    analysis/.DS_Store
+    Ignored:    data/NG-A5307/
+    Ignored:    data/Ref/
+
+Untracked files:
+    Untracked:  analysis/CF.Rmd
+    Untracked:  analysis/CM.Rmd
+
+</code></pre>
+<p>
+Note that any generated files, e.g. HTML, png, CSS, etc., are not
+included in this status report because it is ok for generated content to
+have uncommitted changes.
+</p>
+</div>
+</div>
+</div>
+</div>
+<hr>
+</div>
+<div id="versions" class="tab-pane fade">
+<p>
+There are no past versions. Publish this analysis with
+<code>wflow_publish()</code> to start tracking its development.
+</p>
+<hr>
+</div>
+</div>
+</div>
+<pre class="r"><code>library(here)
+library(tximeta)
+library(DESeq2)
+library(vsn)
+library(pheatmap)
+library(RColorBrewer)
+library(biomaRt)
+library(tidyverse)
+library(msigdbr)
+library(clusterProfiler)
+library(ggpubr)
+library(EnhancedVolcano)</code></pre>
+<pre class="r"><code>basedir &lt;- &quot;/Users/immbio/Desktop/Project/Angelina/NC_HTx_03/data/&quot;</code></pre>
+<div id="load-data-and-create-a-summarizedexperiment"
+class="section level2">
+<h2>load data and create a SummarizedExperiment</h2>
+<pre class="r"><code>target_folder &lt;- file.path(basedir, &quot;Ref/quants/CF&quot;)
+folders &lt;- list.dirs(path = target_folder, full.names = TRUE, recursive = FALSE)
+folder_names &lt;- basename(folders)
+
+coldata &lt;- data.frame(names = folder_names)
+
+coldata$files &lt;- file.path(paste0(folders), &quot;quant.sf&quot;)
+
+file.exists(coldata$files)</code></pre>
+<pre><code> [1] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE</code></pre>
+<pre class="r"><code>se &lt;- tximeta(coldata)
+
+dim(se)</code></pre>
+<pre><code>[1] 193724     18</code></pre>
+<pre class="r"><code>head(rownames(se))</code></pre>
+<pre><code>[1] &quot;ENST00000631435&quot; &quot;ENST00000415118&quot; &quot;ENST00000448914&quot; &quot;ENST00000434970&quot; &quot;ENST00000633010&quot;
+[6] &quot;ENST00000633009&quot;</code></pre>
+<pre class="r"><code>gse &lt;- summarizeToGene(se)
+
+dim(gse)</code></pre>
+<pre><code>[1] 38244    18</code></pre>
+<pre class="r"><code>head(rownames(gse))</code></pre>
+<pre><code>[1] &quot;ENSG00000000003&quot; &quot;ENSG00000000005&quot; &quot;ENSG00000000419&quot; &quot;ENSG00000000457&quot; &quot;ENSG00000000460&quot;
+[6] &quot;ENSG00000000938&quot;</code></pre>
+<pre class="r"><code>gse@assays</code></pre>
+<pre><code>An object of class &quot;SimpleAssays&quot;
+Slot &quot;data&quot;:
+List of length 3
+names(3): counts abundance length</code></pre>
+<pre class="r"><code>assayNames(gse)</code></pre>
+<pre><code>[1] &quot;counts&quot;    &quot;abundance&quot; &quot;length&quot;   </code></pre>
+<pre class="r"><code>coldata$names</code></pre>
+<pre><code> [1] &quot;NG-A5307_HTx_03_17_hiPS_CF_Fibro1_FCS_24h_libLAP4853_quant&quot;        
+ [2] &quot;NG-A5307_HTx_03_18_hiPS_CF_Fibro1_BMP4_50_24h_libLAP4854_quant&quot;    
+ [3] &quot;NG-A5307_HTx_03_19_hiPS_CF_Fibro1_BMP4_500_24h_libLAP4855_quant&quot;   
+ [4] &quot;NG-A5307_HTx_03_20_hiPS_CF_Fibro1_MFAP5_50_24h_libLAP4856_quant&quot;   
+ [5] &quot;NG-A5307_HTx_03_21_hiPS_CF_Fibro1_BSA_24h_libLAP4857_quant&quot;        
+ [6] &quot;NG-A5307_HTx_03_22_hiPS_CF_Fibro1_HGF_50_24h_libLAP4858_quant&quot;     
+ [7] &quot;NG-A5307_HTx_03_23_hiPS_CF_Fibro1_HGF_500_24h_libLAP4859_quant&quot;    
+ [8] &quot;NG-A5307_HTx_03_24_hiPS_CF_Fibro1_MFAP5_200_24h_libLAP4860_quant&quot;  
+ [9] &quot;NG-A5307_HTx_03_25_hiPS_CF_Fibro1_SB431542_10_24h_libLAP4861_quant&quot;
+[10] &quot;NG-A5307_HTx_03_26_hiPS_CF_Fibro3_FCS_24h_libLAP4862_quant&quot;        
+[11] &quot;NG-A5307_HTx_03_27_hiPS_CF_Fibro3_BMP4_50_24h_libLAP4863_quant&quot;    
+[12] &quot;NG-A5307_HTx_03_28_hiPS_CF_Fibro3_BMP4_500_24h_libLAP4864_quant&quot;   
+[13] &quot;NG-A5307_HTx_03_29_hiPS_CF_Fibro3_MFAP5_50_24h_libLAP4865_quant&quot;   
+[14] &quot;NG-A5307_HTx_03_30_hiPS_CF_Fibro3_BSA_24h_libLAP4866_quant&quot;        
+[15] &quot;NG-A5307_HTx_03_31_hiPS_CF_Fibro3_HGF_50_24h_libLAP4867_quant&quot;     
+[16] &quot;NG-A5307_HTx_03_32_hiPS_CF_Fibro3_HGF_500_24h_libLAP4868_quant&quot;    
+[17] &quot;NG-A5307_HTx_03_33_hiPS_CF_Fibro3_MFAP5_200_24h_libLAP4869_quant&quot;  
+[18] &quot;NG-A5307_HTx_03_34_hiPS_CF_Fibro3_SB431542_10_24h_libLAP4870_quant&quot;</code></pre>
+<div id="add-metadata" class="section level3">
+<h3>add metadata</h3>
+<pre class="r"><code>#assign stimulation condition
+colData(gse)$stim &lt;- &quot;stim&quot;
+colData(gse)$stim[grepl(&quot;BMP4_50_24h&quot;, colData(gse)$names)] &lt;- &quot;BMP_50&quot;
+colData(gse)$stim[grepl(&quot;BMP4_500_24h&quot;, colData(gse)$names)] &lt;- &quot;BMP_500&quot;
+colData(gse)$stim[grepl(&quot;HGF_50_24h&quot;, colData(gse)$names)] &lt;- &quot;HGF_50&quot;
+colData(gse)$stim[grepl(&quot;HGF_500_24h&quot;, colData(gse)$names)] &lt;- &quot;HGF_500&quot;
+colData(gse)$stim[grepl(&quot;MFAP5_50_24h&quot;, colData(gse)$names)] &lt;- &quot;MFAP5_50&quot;
+colData(gse)$stim[grepl(&quot;MFAP5_200_24h&quot;, colData(gse)$names)] &lt;- &quot;MFAP5_200&quot;
+colData(gse)$stim[grepl(&quot;SB431542&quot;, colData(gse)$names)] &lt;- &quot;SB431542&quot;
+colData(gse)$stim[grepl(&quot;FCS_24h&quot;, colData(gse)$names)] &lt;- &quot;FCS&quot;
+colData(gse)$stim[grepl(&quot;BSA_24h&quot;, colData(gse)$names)] &lt;- &quot;BSA&quot;
+table(colData(gse)$stim)</code></pre>
+<pre><code>
+   BMP_50   BMP_500       BSA       FCS    HGF_50   HGF_500 MFAP5_200  MFAP5_50  SB431542 
+        2         2         2         2         2         2         2         2         2 </code></pre>
+<pre class="r"><code>colData(gse)$stim &lt;- as.factor(colData(gse)$stim)
+
+colData(gse)$stim2 &lt;- &quot;stim2&quot;
+colData(gse)$stim2[grepl(&quot;FCS|BSA&quot;, colData(gse)$names)] &lt;- &quot;ctr&quot;
+colData(gse)$stim2[grepl(&quot;BMP&quot;, colData(gse)$names)] &lt;- &quot;BMP&quot;
+colData(gse)$stim2[grepl(&quot;HGF&quot;, colData(gse)$names)] &lt;- &quot;HGF&quot;
+colData(gse)$stim2[grepl(&quot;MFAP5&quot;, colData(gse)$names)] &lt;- &quot;MFAP5&quot;
+colData(gse)$stim2[grepl(&quot;SB431542&quot;, colData(gse)$names)] &lt;- &quot;SB431542&quot;
+table(colData(gse)$stim2)</code></pre>
+<pre><code>
+     BMP      ctr      HGF    MFAP5 SB431542 
+       4        4        4        4        2 </code></pre>
+<pre class="r"><code>colData(gse)$stim2 &lt;- as.factor(colData(gse)$stim2)
+
+#assign patient code
+colData(gse)$pc &lt;- &quot;pc&quot;
+colData(gse)$pc[grepl(&quot;Fibro1&quot;, colData(gse)$names)] &lt;- &quot;Fibro1&quot;
+colData(gse)$pc[grepl(&quot;Fibro3&quot;, colData(gse)$names)] &lt;- &quot;Fibro3&quot;
+table(colData(gse)$pc)</code></pre>
+<pre><code>
+Fibro1 Fibro3 
+     9      9 </code></pre>
+<pre class="r"><code>colData(gse)$pc &lt;- as.factor(colData(gse)$pc)
+
+saveRDS(gse, file=paste0(basedir, &quot;gse_stimhiPS.rds&quot;))</code></pre>
+<pre class="r"><code>gse &lt;- readRDS(file=paste0(basedir, &quot;gse_stimhiPS.rds&quot;))</code></pre>
+</div>
+</div>
+<div id="sample-distance" class="section level1">
+<h1>sample distance</h1>
+<div id="construct-a-deseqdataset-stim" class="section level3">
+<h3>construct a DESeqDataSet stim</h3>
+<pre class="r"><code>##construct a DESeqDataSet object
+#dds &lt;- DESeqDataSet(gse, design = ~ cell + dex)
+dds &lt;- DESeqDataSet(gse, design = ~ stim2)
+
+## pre-filtering
+nrow(dds)</code></pre>
+<pre><code>[1] 38244</code></pre>
+<pre class="r"><code>smallestGroupSize &lt;- 2
+keep &lt;- rowSums(counts(dds) &gt;= 10) &gt;= smallestGroupSize
+dds &lt;- dds[keep,]
+nrow(dds)</code></pre>
+<pre><code>[1] 16654</code></pre>
+<pre class="r"><code>## variance stabilizing transformation
+lambda &lt;- 10^seq(from = -1, to = 2, length = 1000)
+cts &lt;- matrix(rpois(1000*100, lambda), ncol = 100)
+meanSdPlot(cts, ranks = FALSE)</code></pre>
+<p><img src="figure/CF.Rmd/construct%20DESeqDataSet%20object%20stim2-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>log.cts.one &lt;- log2(cts + 1)
+meanSdPlot(log.cts.one, ranks = FALSE)</code></pre>
+<p><img src="figure/CF.Rmd/construct%20DESeqDataSet%20object%20stim2-2.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>vsd &lt;- vst(dds, blind = FALSE)
+rld &lt;- rlog(dds, blind = FALSE)
+
+dds &lt;- estimateSizeFactors(dds)
+
+##RNA-seq counts, however, the expected variance grows with the mean
+df &lt;- bind_rows(
+  as_data_frame(log2(counts(dds, normalized=TRUE)[, 1:2]+1)) %&gt;%
+         mutate(transformation = &quot;log2(x + 1)&quot;),
+  as_data_frame(assay(vsd)[, 1:2]) %&gt;% mutate(transformation = &quot;vst&quot;),
+  as_data_frame(assay(rld)[, 1:2]) %&gt;% mutate(transformation = &quot;rlog&quot;))
+  
+colnames(df)[1:2] &lt;- c(&quot;x&quot;, &quot;y&quot;)  
+
+lvls &lt;- c(&quot;log2(x + 1)&quot;, &quot;vst&quot;, &quot;rlog&quot;)
+df$transformation &lt;- factor(df$transformation, levels=lvls)
+
+ggplot(df, aes(x = x, y = y)) + geom_hex(bins = 80) +
+  coord_fixed() + facet_grid( . ~ transformation)  </code></pre>
+<p><img src="figure/CF.Rmd/construct%20DESeqDataSet%20object%20stim2-3.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="sample-distance-1" class="section level3">
+<h3>sample distance</h3>
+</div>
+<div id="distance-heatmap" class="section level3">
+<h3>distance heatmap</h3>
+<pre class="r"><code>sampleDistMatrix &lt;- as.matrix( sampleDists )
+rownames(sampleDistMatrix) &lt;- paste(rld$stim, rld$pc, sep = &quot; - &quot; )
+colnames(sampleDistMatrix) &lt;- NULL
+colors &lt;- colorRampPalette(rev(brewer.pal(9, &quot;BuPu&quot;)) )(255)
+pheatmap(sampleDistMatrix,
+         clustering_distance_rows = sampleDists,
+         clustering_distance_cols = sampleDists,
+         col = colors)</code></pre>
+<p><img src="figure/CF.Rmd/distance%20heatmap-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>colors &lt;- colorRampPalette(rev(brewer.pal(9, &quot;Blues&quot;)) )(255)
+pheatmap(sampleDistMatrix,
+         clustering_distance_rows = sampleDists,
+         clustering_distance_cols = sampleDists,
+         col = colors)</code></pre>
+<p><img src="figure/CF.Rmd/distance%20heatmap-2.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="distance-mds" class="section level3">
+<h3>distance MDS</h3>
+<pre class="r"><code>colCond &lt;- c(&quot;#213782&quot;,&quot;#822145&quot;,&quot;#f4a582&quot;,&quot;#8c510a&quot;,&quot;#B45B5C&quot;,&quot;#725663FF&quot;,&quot;#D53E4F&quot;,&quot;grey&quot;,&quot;lightgrey&quot;)
+names(colCond) &lt;- c(&quot;BMP_50&quot;, &quot;BMP_500&quot;, &quot;HGF_50&quot;, &quot;HGF_500&quot;, &quot;MFAP5_50&quot;, &quot;MFAP5_200&quot;,&quot;SB431542&quot;,&quot;FCS&quot;, &quot;BSA&quot;)
+
+colpc &lt;- c(&quot;#ABDDA4&quot;,&quot;#779d8d&quot;)
+names(colpc) &lt;- c(&quot;Fibro1&quot;,&quot;Fibro3&quot;)
+
+#plotPCA(rld, intgroup = c(&quot;cond&quot;, &quot;grp&quot;))
+plotPCA(rld, intgroup = c(&quot;stim&quot;, &quot;pc&quot;)) +
+  geom_point(aes(color = stim), size = 8, alpha = 0.8) +
+  scale_color_manual(values = colCond) # size = dot size, alpha = transparency</code></pre>
+<p><img src="figure/CF.Rmd/vis%20dim%20red%20bulk-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>mds &lt;- as.data.frame(colData(rld))  %&gt;%
+         cbind(cmdscale(sampleDistMatrix))
+ggplot(mds, aes(x = `1`, y = `2`, color = stim, shape = pc)) +
+  geom_point(size = 4, alpha = 0.8) +
+  scale_color_manual(values = colCond) +
+  geom_point(size = 4) + coord_fixed() + ggtitle(&quot;MDS with rld data&quot;)</code></pre>
+<p><img src="figure/CF.Rmd/vis%20dim%20red%20bulk-2.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="bmp-vs-ctr" class="section level2">
+<h2>BMP vs ctr</h2>
+<div id="diff-expressed-in-bmp4-vs-ctr" class="section level3">
+<h3>diff expressed in BMP4 vs ctr</h3>
+<pre class="r"><code>dds &lt;- DESeq(dds)
+res &lt;- results(dds, contrast = c(&quot;stim2&quot;, &quot;BMP&quot;, &quot;ctr&quot;)) ## define which conditions to contrast
+#res &lt;- results(dds)
+res</code></pre>
+<pre><code>log2 fold change (MLE): stim2 BMP vs ctr 
+Wald test p-value: stim2 BMP vs ctr 
+DataFrame with 16654 rows and 6 columns
+                  baseMean log2FoldChange     lfcSE       stat    pvalue      padj
+                 &lt;numeric&gt;      &lt;numeric&gt; &lt;numeric&gt;  &lt;numeric&gt; &lt;numeric&gt; &lt;numeric&gt;
+ENSG00000000003   1765.144     0.05561300 0.0678520  0.8196219  0.412432  0.752200
+ENSG00000000419   2171.450    -0.06274285 0.0648636 -0.9673049  0.333392  0.686703
+ENSG00000000457    439.888    -0.00964451 0.0996325 -0.0968009  0.922885  0.984237
+ENSG00000000460    396.343    -0.11781996 0.1362929 -0.8644612  0.387335  0.732450
+ENSG00000000971    526.575    -0.18713695 0.2853573 -0.6557986  0.511954  0.818353
+...                    ...            ...       ...        ...       ...       ...
+ENSG00000290315   73.59986      -0.431459  0.663967  -0.649820  0.515808  0.820830
+ENSG00000290318  597.05975       0.057510  0.234416   0.245333  0.806199  0.950706
+ENSG00000291237 5794.92870      -0.140101  0.129595  -1.081070  0.279666  0.632849
+ENSG00000291239    1.85128      -1.833408  3.441918  -0.532670  0.594262        NA
+ENSG00000291240    5.82846       2.278831  2.289183   0.995478  0.319504        NA</code></pre>
+<pre class="r"><code>genes &lt;- data.frame(ensID=rownames(res))
+mart &lt;- useDataset(&quot;hsapiens_gene_ensembl&quot;, useMart(&quot;ensembl&quot;))
+
+G_list &lt;- getBM(attributes=c(&#39;hgnc_symbol&#39;, &#39;ensembl_gene_id&#39;), 
+      filters = &#39;ensembl_gene_id&#39;, 
+      values = genes$ensID, 
+      mart = mart)
+
+resDat &lt;- data.frame(res@listData) %&gt;% mutate(ensembl_gene_id = rownames(res)) %&gt;% 
+  left_join(., G_list, by= &quot;ensembl_gene_id&quot;)</code></pre>
+</div>
+<div id="top-50-heatmap" class="section level3">
+<h3>top 50 heatmap</h3>
+<pre class="r"><code>colCond2 &lt;- c(&quot;#355C7D&quot;,&quot;#f4a582&quot;,&quot;#B45B5C&quot;,&quot;#A59C94&quot;,&quot;#D53E4F&quot;)
+names(colCond2) &lt;- c(&quot;BMP&quot;,&quot;HGF&quot;,&quot;MFAP5&quot;,&quot;ctr&quot;, &quot;SB431542&quot;)
+
+topGenes &lt;- head(order(res$padj),50)
+#topGenes &lt;- resDat$ensembl_gene_id[which(resDat$padj &lt; 0.01)]
+
+mat  &lt;- assay(rld)[ topGenes, ]
+namesDat &lt;- data.frame(ensembl_gene_id = rownames(mat)) %&gt;%
+  left_join(., G_list, by= &quot;ensembl_gene_id&quot;)
+
+# Define annotation colors
+ann_colors &lt;- list(
+  stim2 = colCond2,
+  pc = colpc,
+  stim = colCond)
+
+anno &lt;- as.data.frame(colData(rld)[, c(&quot;stim2&quot;, &quot;stim&quot; ,&quot;pc&quot;)])
+
+# custom heatmap colors
+heat_colors &lt;- colorRampPalette(c(&quot;#2166AC&quot;, &quot;#F7F7F7&quot;, &quot;#B2182B&quot;))(50)
+
+pheatmap(mat, annotation_col = anno, annotation_colors = ann_colors, scale = &quot;row&quot;,
+         labels_row = namesDat$hgnc_symbol, color = heat_colors, labels_col = rep(&quot;&quot;, ncol(mat)))</code></pre>
+<p><img src="figure/CF.Rmd/top%2050%20BMP%20vs%20ctr%20heatmap-1.png" width="576" style="display: block; margin: auto;" /></p>
+</div>
+<div id="top-100-heatmap" class="section level3">
+<h3>top 100 heatmap</h3>
+<pre class="r"><code>topGenes &lt;- head(order(res$padj),100)
+#topGenes &lt;- resDat$ensembl_gene_id[which(resDat$padj &lt; 0.01)]
+
+mat  &lt;- assay(rld)[ topGenes, ]
+namesDat &lt;- data.frame(ensembl_gene_id = rownames(mat)) %&gt;%
+  left_join(., G_list, by= &quot;ensembl_gene_id&quot;)
+
+# Define annotation colors
+ann_colors &lt;- list(
+  stim2 = colCond2,
+  pc = colpc,
+  stim = colCond)
+
+anno &lt;- as.data.frame(colData(rld)[, c(&quot;stim2&quot;, &quot;stim&quot; ,&quot;pc&quot;)])
+
+# custom heatmap colors
+heat_colors &lt;- colorRampPalette(c(&quot;#2166AC&quot;, &quot;#F7F7F7&quot;, &quot;#B2182B&quot;))(50)
+
+pheatmap(mat, annotation_col = anno, annotation_colors = ann_colors, scale = &quot;row&quot;,
+         labels_row = namesDat$hgnc_symbol, color = heat_colors, labels_col = rep(&quot;&quot;, ncol(mat)))</code></pre>
+<p><img src="figure/CF.Rmd/top%20100%20BMP%20vs%20ctr%20heatmap-1.png" width="576" style="display: block; margin: auto;" /></p>
+</div>
+<div id="vulcano" class="section level3">
+<h3>vulcano</h3>
+<pre class="r"><code>res$symbol &lt;- resDat$hgnc_symbol
+EnhancedVolcano(res,
+    lab = res$symbol,
+    x = &#39;log2FoldChange&#39;,
+    y = &#39;pvalue&#39;,
+    xlim = c(-10, 10),
+    #ylim = c(0,50),
+    pCutoff = 10e-05,
+    FCcutoff = 1,
+    title = &quot;DeSEQ2 results&quot;,
+    subtitle = bquote(italic(&quot;BMP4 vs ctr&quot;)))</code></pre>
+<p><img src="figure/CF.Rmd/vulcano%20BMP%20vs%20ctr-1.png" width="1248" style="display: block; margin: auto;" /></p>
+</div>
+<div id="pathway-analysis" class="section level3">
+<h3>pathway analysis</h3>
+<pre class="r"><code>rankedGenes &lt;- resDat %&gt;%
+  filter(!is.na(ensembl_gene_id)) %&gt;%
+  mutate(rank = log2FoldChange) %&gt;%
+  arrange(desc(rank)) %&gt;%
+  pull(rank, ensembl_gene_id)
+
+head(rankedGenes)</code></pre>
+<pre><code>ENSG00000225164 ENSG00000236014 ENSG00000288825 ENSG00000206492 ENSG00000273673 ENSG00000276959 
+       25.26096        24.96125        23.55782        23.22359        22.88103        21.56039 </code></pre>
+<pre class="r"><code>rankedGenes &lt;- resDat %&gt;%
+  filter(!is.na(ensembl_gene_id)) %&gt;%
+  mutate(rank = -log10({pvalue}) * sign({log2FoldChange})) %&gt;%
+  filter(!is.na(rank)) %&gt;% 
+  arrange(desc(rank)) %&gt;%
+  pull(rank, ensembl_gene_id)
+
+head(rankedGenes)</code></pre>
+<pre><code>ENSG00000137834 ENSG00000107731 ENSG00000283060 ENSG00000125968 ENSG00000163638 ENSG00000095739 
+      254.61297       232.90793       154.72765       148.93191       107.07489        99.14536 </code></pre>
+<pre class="r"><code>term2gene &lt;- msigdbr(species = &quot;Homo sapiens&quot;, category = &quot;H&quot;) %&gt;% 
+  dplyr::select(gs_name, ensembl_gene)
+term2name &lt;- msigdbr(species = &quot;Homo sapiens&quot;, category = &quot;H&quot;) %&gt;% 
+  dplyr::select(gs_name, gs_description) %&gt;% 
+  distinct()
+
+gseaRes &lt;- GSEA(rankedGenes,
+                TERM2GENE = term2gene,
+                TERM2NAME = term2name,
+                pvalueCutoff = 1.00, 
+                minGSSize = 5,
+                maxGSSize = 500)
+
+gseaResDat &lt;- gseaRes@result
+
+as_tibble(gseaRes) %&gt;% 
+  arrange(desc(abs(NES))) %&gt;% 
+  top_n(20, wt=-p.adjust) %&gt;% 
+  dplyr::select(-core_enrichment) %&gt;%
+  mutate(across(c(&quot;enrichmentScore&quot;, &quot;NES&quot;), round, digits=3)) %&gt;% 
+  mutate(across(c(&quot;pvalue&quot;, &quot;p.adjust&quot;, &quot;qvalue&quot;), scales::scientific))</code></pre>
+<pre><code># A tibble: 20 × 10
+   ID            Description setSize enrichmentScore   NES pvalue p.adjust qvalue  rank leading_edge
+   &lt;chr&gt;         &lt;chr&gt;         &lt;int&gt;           &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt;  &lt;chr&gt;    &lt;chr&gt;  &lt;dbl&gt; &lt;chr&gt;       
+ 1 HALLMARK_TGF… Genes up-r…      52           0.917  2.05 1.39e… 3.46e-03 3.06e…   719 tags=35%, l…
+ 2 HALLMARK_MYC… A subgroup…      56          -0.759 -2.00 6.44e… 1.07e-02 9.49e…  2106 tags=46%, l…
+ 3 HALLMARK_MYC… A subgroup…     195          -0.592 -1.85 2.31e… 1.16e-03 1.02e…  3016 tags=39%, l…
+ 4 HALLMARK_EPI… Genes defi…     195           0.672  1.71 2.00e… 2.00e-01 1.77e…   743 tags=20%, l…
+ 5 HALLMARK_MYO… Genes invo…     163           0.632  1.58 3.62e… 2.59e-01 2.29e…  1412 tags=23%, l…
+ 6 HALLMARK_E2F… Genes enco…     199          -0.503 -1.57 4.61e… 5.76e-02 5.09e…  2986 tags=24%, l…
+ 7 HALLMARK_AND… Genes defi…      94           0.633  1.53 5.56e… 2.79e-01 2.46e…  1057 tags=20%, l…
+ 8 HALLMARK_PAN… Genes spec…      20           0.762  1.53 8.50e… 3.27e-01 2.89e…  1924 tags=30%, l…
+ 9 HALLMARK_XEN… Genes enco…     158           0.608  1.52 5.57e… 2.79e-01 2.46e…  1057 tags=9%, li…
+10 HALLMARK_INF… Genes defi…     151          -0.451 -1.38 4.24e… 2.65e-01 2.34e…  1456 tags=21%, l…
+11 HALLMARK_IL2… Genes up-r…     173          -0.443 -1.37 3.05e… 2.54e-01 2.25e…   632 tags=14%, l…
+12 HALLMARK_HYP… Genes up-r…     180           0.531  1.34 1.29e… 3.43e-01 3.03e…   698 tags=13%, l…
+13 HALLMARK_ADI… Genes up-r…     183           0.528  1.34 1.32e… 3.43e-01 3.03e…  1311 tags=11%, l…
+14 HALLMARK_UV_… Genes down…     142           0.538  1.34 1.36e… 3.43e-01 3.03e…   808 tags=11%, l…
+15 HALLMARK_EST… Genes defi…     166           0.528  1.33 1.33e… 3.43e-01 3.03e…  1106 tags=14%, l…
+16 HALLMARK_IL6… Genes up-r…      63          -0.489 -1.32 1.25e… 3.43e-01 3.03e…  2331 tags=32%, l…
+17 HALLMARK_G2M… Genes invo…     195          -0.41  -1.28 7.72e… 3.22e-01 2.84e…  2133 tags=18%, l…
+18 HALLMARK_OXI… Genes enco…     196          -0.4   -1.25 6.88e… 3.13e-01 2.77e…  3619 tags=33%, l…
+19 HALLMARK_COA… Genes enco…     102          -0.43  -1.24 1.37e… 3.43e-01 3.03e…   629 tags=11%, l…
+20 HALLMARK_INT… Genes up-r…     167          -0.4   -1.22 1.03e… 3.43e-01 3.03e…  2322 tags=26%, l…</code></pre>
+<pre class="r"><code>dotplot(gseaRes, showCategory=10, split=&quot;.sign&quot;) + facet_grid(.~.sign)</code></pre>
+<p><img src="figure/CF.Rmd/pathway%20anaysis%20BMP%20vs%20ctr-2-1.png" width="960" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>selGODat &lt;- gseaResDat %&gt;% 
+  arrange(desc(abs(NES))) %&gt;% 
+  top_n(20, wt=-p.adjust) %&gt;% 
+  mutate(qscore=-log(p.adjust, base=10)) %&gt;% 
+  mutate(cluster=&quot;BMP&quot;)
+
+p &lt;- ggbarplot(selGODat, x = &quot;ID&quot;, y = &quot;qscore&quot;,
+          fill = &quot;cluster&quot;,               
+          color = &quot;cluster&quot;,            
+          palette = colCond2,            
+          sort.val = &quot;asc&quot;,           
+          sort.by.groups = TRUE      
+          #x.text.angle = 90           
+          ) + 
+  rotate()
+p</code></pre>
+<p><img src="figure/CF.Rmd/pathway%20anaysis%20BMP%20vs%20ctr-3-1.png" width="960" style="display: block; margin: auto;" /></p>
+</div>
+</div>
+<div id="hgf-vs-ctr" class="section level2">
+<h2>HGF vs ctr</h2>
+<div id="diff-expressed-in-hgf-vs-ctr" class="section level3">
+<h3>diff expressed in HGF vs ctr</h3>
+<pre class="r"><code>dds &lt;- DESeq(dds)
+res &lt;- results(dds, contrast = c(&quot;stim2&quot;, &quot;HGF&quot;, &quot;ctr&quot;)) ## define which conditions to contrast
+#res &lt;- results(dds)
+res</code></pre>
+<pre><code>log2 fold change (MLE): stim2 HGF vs ctr 
+Wald test p-value: stim2 HGF vs ctr 
+DataFrame with 16654 rows and 6 columns
+                  baseMean log2FoldChange     lfcSE      stat    pvalue      padj
+                 &lt;numeric&gt;      &lt;numeric&gt; &lt;numeric&gt; &lt;numeric&gt; &lt;numeric&gt; &lt;numeric&gt;
+ENSG00000000003   1765.144     -0.1451470 0.0680069 -2.134299 0.0328183  0.769558
+ENSG00000000419   2171.450     -0.0446144 0.0646645 -0.689937 0.4902340  1.000000
+ENSG00000000457    439.888     -0.0779412 0.0991721 -0.785918 0.4319153  1.000000
+ENSG00000000460    396.343      0.2780856 0.1351497  2.057611 0.0396275  0.783645
+ENSG00000000971    526.575     -0.1010862 0.2849801 -0.354713 0.7228044  1.000000
+...                    ...            ...       ...       ...       ...       ...
+ENSG00000290315   73.59986     -0.3931946  0.663372 -0.592721  0.553368         1
+ENSG00000290318  597.05975      0.2209540  0.234050  0.944046  0.345146         1
+ENSG00000291237 5794.92870     -0.0681963  0.129505 -0.526590  0.598478         1
+ENSG00000291239    1.85128     -1.8579768  3.434782 -0.540930  0.588556         1
+ENSG00000291240    5.82846      1.1114342  2.298728  0.483500  0.628741         1</code></pre>
+<pre class="r"><code>genes &lt;- data.frame(ensID=rownames(res))
+mart &lt;- useDataset(&quot;hsapiens_gene_ensembl&quot;, useMart(&quot;ensembl&quot;))
+
+G_list &lt;- getBM(attributes=c(&#39;hgnc_symbol&#39;, &#39;ensembl_gene_id&#39;), 
+      filters = &#39;ensembl_gene_id&#39;, 
+      values = genes$ensID, 
+      mart = mart)
+
+resDat &lt;- data.frame(res@listData) %&gt;% mutate(ensembl_gene_id = rownames(res)) %&gt;% 
+  left_join(., G_list, by= &quot;ensembl_gene_id&quot;)</code></pre>
+</div>
+<div id="top-50-heatmap-1" class="section level3">
+<h3>top 50 heatmap</h3>
+<pre class="r"><code>topGenes &lt;- head(order(res$padj),50)
+#topGenes &lt;- resDat$ensembl_gene_id[which(resDat$padj &lt; 0.01)]
+
+mat  &lt;- assay(rld)[ topGenes, ]
+namesDat &lt;- data.frame(ensembl_gene_id = rownames(mat)) %&gt;%
+  left_join(., G_list, by= &quot;ensembl_gene_id&quot;)
+
+# Define annotation colors
+ann_colors &lt;- list(
+  stim2 = colCond2,
+  pc = colpc,
+  stim = colCond)
+
+anno &lt;- as.data.frame(colData(rld)[, c(&quot;stim2&quot;, &quot;stim&quot; ,&quot;pc&quot;)])
+
+# custom heatmap colors
+heat_colors &lt;- colorRampPalette(c(&quot;#2166AC&quot;, &quot;#F7F7F7&quot;, &quot;#B2182B&quot;))(50)
+
+pheatmap(mat, annotation_col = anno, annotation_colors = ann_colors, scale = &quot;row&quot;,
+         labels_row = namesDat$hgnc_symbol, color = heat_colors, labels_col = rep(&quot;&quot;, ncol(mat)))</code></pre>
+<p><img src="figure/CF.Rmd/top%2050%20HGF%20vs%20ctr%20heatmap-1.png" width="576" style="display: block; margin: auto;" /></p>
+</div>
+<div id="top-100-heatmap-1" class="section level3">
+<h3>top 100 heatmap</h3>
+<pre class="r"><code>topGenes &lt;- head(order(res$padj),100)
+#topGenes &lt;- resDat$ensembl_gene_id[which(resDat$padj &lt; 0.01)]
+
+mat  &lt;- assay(rld)[ topGenes, ]
+namesDat &lt;- data.frame(ensembl_gene_id = rownames(mat)) %&gt;%
+  left_join(., G_list, by= &quot;ensembl_gene_id&quot;)
+
+# Define annotation colors
+ann_colors &lt;- list(
+  stim2 = colCond2,
+  pc = colpc,
+  stim = colCond)
+
+anno &lt;- as.data.frame(colData(rld)[, c(&quot;stim2&quot;, &quot;stim&quot; ,&quot;pc&quot;)])
+
+# custom heatmap colors
+heat_colors &lt;- colorRampPalette(c(&quot;#2166AC&quot;, &quot;#F7F7F7&quot;, &quot;#B2182B&quot;))(50)
+
+pheatmap(mat, annotation_col = anno, annotation_colors = ann_colors, scale = &quot;row&quot;,
+         labels_row = namesDat$hgnc_symbol, color = heat_colors, labels_col = rep(&quot;&quot;, ncol(mat)))</code></pre>
+<p><img src="figure/CF.Rmd/top%20100%20HGF%20vs%20ctr%20heatmap-1.png" width="576" style="display: block; margin: auto;" /></p>
+</div>
+<div id="vulcano-1" class="section level3">
+<h3>vulcano</h3>
+<pre class="r"><code>res$symbol &lt;- resDat$hgnc_symbol
+EnhancedVolcano(res,
+    lab = res$symbol,
+    x = &#39;log2FoldChange&#39;,
+    y = &#39;pvalue&#39;,
+    xlim = c(-10, 10),
+    ylim = c(0,20),
+    pCutoff = 10e-05,
+    FCcutoff = 1,
+    title = &quot;DeSEQ2 results&quot;,
+    subtitle = bquote(italic(&quot;HGF vs ctr&quot;)))</code></pre>
+<p><img src="figure/CF.Rmd/vulcano%20HGF%20vs%20ctr-1.png" width="1248" style="display: block; margin: auto;" /></p>
+</div>
+</div>
+<div id="mfaf5-vs-ctr" class="section level2">
+<h2>MFAF5 vs ctr</h2>
+<div id="diff-expressed-in-mfap5-vs-ctr" class="section level3">
+<h3>diff expressed in MFAP5 vs ctr</h3>
+<pre class="r"><code>dds &lt;- DESeq(dds)
+res &lt;- results(dds, contrast = c(&quot;stim2&quot;, &quot;MFAP5&quot;, &quot;ctr&quot;)) ## define which conditions to contrast
+#res &lt;- results(dds)
+res</code></pre>
+<pre><code>log2 fold change (MLE): stim2 MFAP5 vs ctr 
+Wald test p-value: stim2 MFAP5 vs ctr 
+DataFrame with 16654 rows and 6 columns
+                  baseMean log2FoldChange     lfcSE       stat    pvalue      padj
+                 &lt;numeric&gt;      &lt;numeric&gt; &lt;numeric&gt;  &lt;numeric&gt; &lt;numeric&gt; &lt;numeric&gt;
+ENSG00000000003   1765.144    -0.05812285 0.0683381 -0.8505196  0.395036         1
+ENSG00000000419   2171.450     0.00132359 0.0649572  0.0203764  0.983743         1
+ENSG00000000457    439.888    -0.01815191 0.1005025 -0.1806115  0.856673         1
+ENSG00000000460    396.343     0.05703124 0.1362828  0.4184771  0.675598         1
+ENSG00000000971    526.575     0.15866777 0.2850284  0.5566736  0.577750         1
+...                    ...            ...       ...        ...       ...       ...
+ENSG00000290315   73.59986     -0.1077137  0.663088  -0.162443  0.870957         1
+ENSG00000290318  597.05975     -0.0268632  0.234728  -0.114444  0.908886         1
+ENSG00000291237 5794.92870      0.1256712  0.129522   0.970267  0.331913         1
+ENSG00000291239    1.85128      0.4920347  3.349393   0.146903  0.883209         1
+ENSG00000291240    5.82846     -3.7615321  2.498000  -1.505817  0.132114         1</code></pre>
+<pre class="r"><code>genes &lt;- data.frame(ensID=rownames(res))
+mart &lt;- useDataset(&quot;hsapiens_gene_ensembl&quot;, useMart(&quot;ensembl&quot;))
+
+G_list &lt;- getBM(attributes=c(&#39;hgnc_symbol&#39;, &#39;ensembl_gene_id&#39;), 
+      filters = &#39;ensembl_gene_id&#39;, 
+      values = genes$ensID, 
+      mart = mart)
+
+resDat &lt;- data.frame(res@listData) %&gt;% mutate(ensembl_gene_id = rownames(res)) %&gt;% 
+  left_join(., G_list, by= &quot;ensembl_gene_id&quot;)</code></pre>
+</div>
+<div id="top-50-heatmap-2" class="section level3">
+<h3>top 50 heatmap</h3>
+<pre class="r"><code>topGenes &lt;- head(order(res$padj),50)
+#topGenes &lt;- resDat$ensembl_gene_id[which(resDat$padj &lt; 0.01)]
+
+mat  &lt;- assay(rld)[ topGenes, ]
+namesDat &lt;- data.frame(ensembl_gene_id = rownames(mat)) %&gt;%
+  left_join(., G_list, by= &quot;ensembl_gene_id&quot;)
+
+# Define annotation colors
+ann_colors &lt;- list(
+  stim2 = colCond2,
+  pc = colpc,
+  stim = colCond)
+
+anno &lt;- as.data.frame(colData(rld)[, c(&quot;stim2&quot;, &quot;stim&quot; ,&quot;pc&quot;)])
+
+# custom heatmap colors
+heat_colors &lt;- colorRampPalette(c(&quot;#2166AC&quot;, &quot;#F7F7F7&quot;, &quot;#B2182B&quot;))(50)
+
+pheatmap(mat, annotation_col = anno, annotation_colors = ann_colors, scale = &quot;row&quot;,
+         labels_row = namesDat$hgnc_symbol, color = heat_colors, labels_col = rep(&quot;&quot;, ncol(mat)))</code></pre>
+<p><img src="figure/CF.Rmd/top%2050%20MFAP5%20vs%20ctr%20heatmap-1.png" width="576" style="display: block; margin: auto;" /></p>
+</div>
+<div id="top-100-heatmap-2" class="section level3">
+<h3>top 100 heatmap</h3>
+<pre class="r"><code>topGenes &lt;- head(order(res$padj),100)
+#topGenes &lt;- resDat$ensembl_gene_id[which(resDat$padj &lt; 0.01)]
+
+mat  &lt;- assay(rld)[ topGenes, ]
+namesDat &lt;- data.frame(ensembl_gene_id = rownames(mat)) %&gt;%
+  left_join(., G_list, by= &quot;ensembl_gene_id&quot;)
+
+# Define annotation colors
+ann_colors &lt;- list(
+  stim2 = colCond2,
+  pc = colpc,
+  stim = colCond)
+
+anno &lt;- as.data.frame(colData(rld)[, c(&quot;stim2&quot;, &quot;stim&quot; ,&quot;pc&quot;)])
+
+# custom heatmap colors
+heat_colors &lt;- colorRampPalette(c(&quot;#2166AC&quot;, &quot;#F7F7F7&quot;, &quot;#B2182B&quot;))(50)
+
+pheatmap(mat, annotation_col = anno, annotation_colors = ann_colors, scale = &quot;row&quot;,
+         labels_row = namesDat$hgnc_symbol, color = heat_colors, labels_col = rep(&quot;&quot;, ncol(mat)))</code></pre>
+<p><img src="figure/CF.Rmd/top%20100%20MFAP5%20vs%20ctr%20heatmap-1.png" width="576" style="display: block; margin: auto;" /></p>
+</div>
+<div id="vulcano-2" class="section level3">
+<h3>vulcano</h3>
+<pre class="r"><code>res$symbol &lt;- resDat$hgnc_symbol
+resdf &lt;- as.data.frame(res)
+EnhancedVolcano(res,
+    lab = res$symbol,
+    x = &#39;log2FoldChange&#39;,
+    y = &#39;pvalue&#39;,
+    xlim = c(-10, 10),
+    ylim = c(0,12),
+    pCutoff = 10e-05,
+    FCcutoff = 1,
+    title = &quot;DeSEQ2 results&quot;,
+    subtitle = bquote(italic(&quot;MFAP5 vs ctr&quot;)))</code></pre>
+<p><img src="figure/CF.Rmd/vulcano%20MFAP5%20vs%20ctr-1.png" width="1248" style="display: block; margin: auto;" /></p>
+</div>
+</div>
+<div id="sb431542-vs-ctr" class="section level2">
+<h2>SB431542 vs ctr</h2>
+<div id="diff-expressed-in-sb431542-vs-ctr" class="section level3">
+<h3>diff expressed in SB431542 vs ctr</h3>
+<pre class="r"><code>dds &lt;- DESeq(dds)
+res &lt;- results(dds, contrast = c(&quot;stim2&quot;, &quot;SB431542&quot;, &quot;ctr&quot;)) ## define which conditions to contrast
+#res &lt;- results(dds)
+res</code></pre>
+<pre><code>log2 fold change (MLE): stim2 SB431542 vs ctr 
+Wald test p-value: stim2 SB431542 vs ctr 
+DataFrame with 16654 rows and 6 columns
+                  baseMean log2FoldChange     lfcSE      stat      pvalue        padj
+                 &lt;numeric&gt;      &lt;numeric&gt; &lt;numeric&gt; &lt;numeric&gt;   &lt;numeric&gt;   &lt;numeric&gt;
+ENSG00000000003   1765.144     -0.1191126 0.0812913 -1.465256  0.14285104   0.3137068
+ENSG00000000419   2171.450      0.0537379 0.0774438  0.693896  0.48774753   0.6985566
+ENSG00000000457    439.888      0.0863378 0.1156612  0.746472  0.45538263   0.6699099
+ENSG00000000460    396.343      0.3694927 0.1600985  2.307908  0.02100424   0.0728892
+ENSG00000000971    526.575      1.0576620 0.3462771  3.054381  0.00225526   0.0113424
+...                    ...            ...       ...       ...         ...         ...
+ENSG00000290315   73.59986      -1.880107  0.816939 -2.301405 2.13688e-02 7.38556e-02
+ENSG00000290318  597.05975      -0.140637  0.285536 -0.492537 6.22340e-01 7.99080e-01
+ENSG00000291237 5794.92870       1.369865  0.158047  8.667454 4.41890e-18 1.60517e-16
+ENSG00000291239    1.85128      -1.095289  4.112339 -0.266342 7.89976e-01          NA
+ENSG00000291240    5.82846       0.770129  2.795307  0.275508 7.82926e-01 8.94345e-01</code></pre>
+<pre class="r"><code>genes &lt;- data.frame(ensID=rownames(res))
+mart &lt;- useDataset(&quot;hsapiens_gene_ensembl&quot;, useMart(&quot;ensembl&quot;))
+
+G_list &lt;- getBM(attributes=c(&#39;hgnc_symbol&#39;, &#39;ensembl_gene_id&#39;), 
+      filters = &#39;ensembl_gene_id&#39;, 
+      values = genes$ensID, 
+      mart = mart)
+
+resDat &lt;- data.frame(res@listData) %&gt;% mutate(ensembl_gene_id = rownames(res)) %&gt;% 
+  left_join(., G_list, by= &quot;ensembl_gene_id&quot;)</code></pre>
+</div>
+<div id="top-50-heatmap-3" class="section level3">
+<h3>top 50 heatmap</h3>
+<pre class="r"><code>topGenes &lt;- head(order(res$padj),50)
+#topGenes &lt;- resDat$ensembl_gene_id[which(resDat$padj &lt; 0.01)]
+
+mat  &lt;- assay(rld)[ topGenes, ]
+namesDat &lt;- data.frame(ensembl_gene_id = rownames(mat)) %&gt;%
+  left_join(., G_list, by= &quot;ensembl_gene_id&quot;)
+
+# Define annotation colors
+ann_colors &lt;- list(
+  stim2 = colCond2,
+  pc = colpc,
+  stim = colCond)
+
+anno &lt;- as.data.frame(colData(rld)[, c(&quot;stim2&quot;, &quot;stim&quot; ,&quot;pc&quot;)])
+
+# custom heatmap colors
+heat_colors &lt;- colorRampPalette(c(&quot;#2166AC&quot;, &quot;#F7F7F7&quot;, &quot;#B2182B&quot;))(50)
+
+pheatmap(mat, annotation_col = anno, annotation_colors = ann_colors, scale = &quot;row&quot;,
+         labels_row = namesDat$hgnc_symbol, color = heat_colors, labels_col = rep(&quot;&quot;, ncol(mat)))</code></pre>
+<p><img src="figure/CF.Rmd/top%2050%20SB431542%20vs%20ctr%20heatmap-1.png" width="576" style="display: block; margin: auto;" /></p>
+</div>
+<div id="top-100-heatmap-3" class="section level3">
+<h3>top 100 heatmap</h3>
+<pre class="r"><code>topGenes &lt;- head(order(res$padj),100)
+#topGenes &lt;- resDat$ensembl_gene_id[which(resDat$padj &lt; 0.01)]
+
+mat  &lt;- assay(rld)[ topGenes, ]
+namesDat &lt;- data.frame(ensembl_gene_id = rownames(mat)) %&gt;%
+  left_join(., G_list, by= &quot;ensembl_gene_id&quot;)
+
+# Define annotation colors
+ann_colors &lt;- list(
+  stim2 = colCond2,
+  pc = colpc,
+  stim = colCond)
+
+anno &lt;- as.data.frame(colData(rld)[, c(&quot;stim2&quot;, &quot;stim&quot; ,&quot;pc&quot;)])
+
+# custom heatmap colors
+heat_colors &lt;- colorRampPalette(c(&quot;#2166AC&quot;, &quot;#F7F7F7&quot;, &quot;#B2182B&quot;))(50)
+
+pheatmap(mat, annotation_col = anno, annotation_colors = ann_colors, scale = &quot;row&quot;,
+         labels_row = namesDat$hgnc_symbol, color = heat_colors, labels_col = rep(&quot;&quot;, ncol(mat)))</code></pre>
+<p><img src="figure/CF.Rmd/top%20100%20SB431542%20vs%20ctr%20heatmap-1.png" width="576" style="display: block; margin: auto;" /></p>
+</div>
+<div id="vulcano-3" class="section level3">
+<h3>vulcano</h3>
+<pre class="r"><code>res$symbol &lt;- resDat$hgnc_symbol
+resdf &lt;- as.data.frame(res)
+EnhancedVolcano(res,
+    lab = res$symbol,
+    x = &#39;log2FoldChange&#39;,
+    y = &#39;pvalue&#39;,
+    xlim = c(-10, 10),
+    #ylim = c(0,12),
+    pCutoff = 10e-05,
+    FCcutoff = 1,
+    title = &quot;DeSEQ2 results&quot;,
+    subtitle = bquote(italic(&quot;SB431542 vs ctr&quot;)))</code></pre>
+<p><img src="figure/CF.Rmd/vulcano%20SB431542%20vs%20ctr-1.png" width="1248" style="display: block; margin: auto;" /></p>
+</div>
+</div>
+<div id="bmp_50-vs-bmp_500" class="section level2">
+<h2>BMP_50 vs BMP_500</h2>
+<div id="construct-a-deseqdataset-stim-1" class="section level3">
+<h3>construct a DESeqDataSet stim</h3>
+<pre class="r"><code>##construct a DESeqDataSet object
+#dds &lt;- DESeqDataSet(gse, design = ~ cell + dex)
+dds &lt;- DESeqDataSet(gse, design = ~ stim)
+
+## pre-filtering
+nrow(dds)</code></pre>
+<pre><code>[1] 38244</code></pre>
+<pre class="r"><code>smallestGroupSize &lt;- 2
+keep &lt;- rowSums(counts(dds) &gt;= 10) &gt;= smallestGroupSize
+dds &lt;- dds[keep,]
+nrow(dds)</code></pre>
+<pre><code>[1] 16654</code></pre>
+<pre class="r"><code>## variance stabilizing transformation
+lambda &lt;- 10^seq(from = -1, to = 2, length = 1000)
+cts &lt;- matrix(rpois(1000*100, lambda), ncol = 100)
+meanSdPlot(cts, ranks = FALSE)</code></pre>
+<p><img src="figure/CF.Rmd/construct%20DESeqDataSet%20object%20stim-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>log.cts.one &lt;- log2(cts + 1)
+meanSdPlot(log.cts.one, ranks = FALSE)</code></pre>
+<p><img src="figure/CF.Rmd/construct%20DESeqDataSet%20object%20stim-2.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>vsd &lt;- vst(dds, blind = FALSE)
+rld &lt;- rlog(dds, blind = FALSE)
+
+dds &lt;- estimateSizeFactors(dds)
+
+##RNA-seq counts, however, the expected variance grows with the mean
+df &lt;- bind_rows(
+  as_data_frame(log2(counts(dds, normalized=TRUE)[, 1:2]+1)) %&gt;%
+         mutate(transformation = &quot;log2(x + 1)&quot;),
+  as_data_frame(assay(vsd)[, 1:2]) %&gt;% mutate(transformation = &quot;vst&quot;),
+  as_data_frame(assay(rld)[, 1:2]) %&gt;% mutate(transformation = &quot;rlog&quot;))
+  
+colnames(df)[1:2] &lt;- c(&quot;x&quot;, &quot;y&quot;)  
+
+lvls &lt;- c(&quot;log2(x + 1)&quot;, &quot;vst&quot;, &quot;rlog&quot;)
+df$transformation &lt;- factor(df$transformation, levels=lvls)
+
+ggplot(df, aes(x = x, y = y)) + geom_hex(bins = 80) +
+  coord_fixed() + facet_grid( . ~ transformation)  </code></pre>
+<p><img src="figure/CF.Rmd/construct%20DESeqDataSet%20object%20stim-3.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="diff-expressed-in-bmp_50-vs-bmp_500" class="section level3">
+<h3>diff expressed in BMP_50 vs BMP_500</h3>
+<pre class="r"><code>dds &lt;- DESeq(dds)
+res &lt;- results(dds, contrast = c(&quot;stim&quot;, &quot;BMP_50&quot;, &quot;BMP_500&quot;)) ## define which conditions to contrast
+#res &lt;- results(dds)
+res</code></pre>
+<pre><code>log2 fold change (MLE): stim BMP_50 vs BMP_500 
+Wald test p-value: stim BMP_50 vs BMP_500 
+DataFrame with 16654 rows and 6 columns
+                  baseMean log2FoldChange     lfcSE       stat    pvalue      padj
+                 &lt;numeric&gt;      &lt;numeric&gt; &lt;numeric&gt;  &lt;numeric&gt; &lt;numeric&gt; &lt;numeric&gt;
+ENSG00000000003   1765.144    -0.08046735  0.103786 -0.7753183  0.438152         1
+ENSG00000000419   2171.450    -0.00778398  0.109562 -0.0710463  0.943361         1
+ENSG00000000457    439.888    -0.10266268  0.148079 -0.6932974  0.488123         1
+ENSG00000000460    396.343    -0.02654708  0.217144 -0.1222554  0.902697         1
+ENSG00000000971    526.575     0.01498195  0.453989  0.0330007  0.973674         1
+...                    ...            ...       ...        ...       ...       ...
+ENSG00000290315   73.59986      1.3182173  0.988099   1.334095  0.182173         1
+ENSG00000290318  597.05975     -0.0704718  0.332767  -0.211775  0.832283         1
+ENSG00000291237 5794.92870     -0.1202061  0.188027  -0.639301  0.522627         1
+ENSG00000291239    1.85128      2.7156214  6.341350   0.428240  0.668476         1
+ENSG00000291240    5.82846     -1.9726841  5.818298  -0.339048  0.734573         1</code></pre>
+<pre class="r"><code>genes &lt;- data.frame(ensID=rownames(res))
+mart &lt;- useDataset(&quot;hsapiens_gene_ensembl&quot;, useMart(&quot;ensembl&quot;))
+
+G_list &lt;- getBM(attributes=c(&#39;hgnc_symbol&#39;, &#39;ensembl_gene_id&#39;), 
+      filters = &#39;ensembl_gene_id&#39;, 
+      values = genes$ensID, 
+      mart = mart)
+
+resDat &lt;- data.frame(res@listData) %&gt;% mutate(ensembl_gene_id = rownames(res)) %&gt;% 
+  left_join(., G_list, by= &quot;ensembl_gene_id&quot;)</code></pre>
+</div>
+<div id="top-50-heatmap-4" class="section level3">
+<h3>top 50 heatmap</h3>
+<pre class="r"><code>topGenes &lt;- head(order(res$padj),50)
+#topGenes &lt;- resDat$ensembl_gene_id[which(resDat$padj &lt; 0.01)]
+
+mat  &lt;- assay(rld)[ topGenes, ]
+namesDat &lt;- data.frame(ensembl_gene_id = rownames(mat)) %&gt;%
+  left_join(., G_list, by= &quot;ensembl_gene_id&quot;)
+
+# Define annotation colors
+ann_colors &lt;- list(
+  stim2 = colCond2,
+  pc = colpc,
+  stim = colCond)
+
+anno &lt;- as.data.frame(colData(rld)[, c(&quot;stim2&quot;, &quot;stim&quot; ,&quot;pc&quot;)])
+
+# custom heatmap colors
+heat_colors &lt;- colorRampPalette(c(&quot;#2166AC&quot;, &quot;#F7F7F7&quot;, &quot;#B2182B&quot;))(50)
+
+pheatmap(mat, annotation_col = anno, annotation_colors = ann_colors, scale = &quot;row&quot;,
+         labels_row = namesDat$hgnc_symbol, color = heat_colors, labels_col = rep(&quot;&quot;, ncol(mat)))</code></pre>
+<p><img src="figure/CF.Rmd/top%2050%20BMP_50%20vs%20BMP_500%20heatmap-1.png" width="576" style="display: block; margin: auto;" /></p>
+</div>
+<div id="vulcano-4" class="section level3">
+<h3>vulcano</h3>
+<pre class="r"><code>res$symbol &lt;- resDat$hgnc_symbol
+EnhancedVolcano(res,
+    lab = res$symbol,
+    x = &#39;log2FoldChange&#39;,
+    y = &#39;pvalue&#39;,
+    xlim = c(-10, 10),
+    ylim = c(0,10),
+    pCutoff = 10e-05,
+    FCcutoff = 1,
+    title = &quot;DeSEQ2 results&quot;,
+    subtitle = bquote(italic(&quot;BMP_50 vs BMP_500&quot;)))</code></pre>
+<p><img src="figure/CF.Rmd/vulcano%20BMP_50%20vs%20BMP_500-1.png" width="1248" style="display: block; margin: auto;" /></p>
+</div>
+</div>
+<div id="plot-selected-genes" class="section level2">
+<h2>plot selected genes</h2>
+<div id="indiv-counts" class="section level3">
+<h3>indiv counts</h3>
+<pre class="r"><code>colCond2 &lt;- c(&quot;#355C7D&quot;,&quot;#A59C94&quot;,&quot;#f4a582&quot;,&quot;#B45B5C&quot;,&quot;#D53E4F&quot;)
+
+sel_genes &lt;- c(&quot;ENSG00000125378&quot;, &quot;ENSG00000107779&quot;, &quot;ENSG00000138696&quot;, &quot;ENSG00000180875&quot;, &quot;ENSG00000105976&quot;, &quot;ENSG00000197614&quot;, &quot;ENSG00000019991&quot;, &quot;ENSG00000276886&quot;)
+
+for(ID in sel_genes){
+  symbol &lt;- G_list$hgnc_symbol[which(G_list$ensembl_gene_id == ID)]
+  plotCounts(dds, gene = ID, intgroup=c(&quot;stim2&quot;), main = symbol, col=colCond2[factor(dds$stim2)],
+             pch = 19)
+}</code></pre>
+<p><img src="figure/CF.Rmd/sel%20genes-1.png" width="576" style="display: block; margin: auto;" /><img src="figure/CF.Rmd/sel%20genes-2.png" width="576" style="display: block; margin: auto;" /><img src="figure/CF.Rmd/sel%20genes-3.png" width="576" style="display: block; margin: auto;" /><img src="figure/CF.Rmd/sel%20genes-4.png" width="576" style="display: block; margin: auto;" /><img src="figure/CF.Rmd/sel%20genes-5.png" width="576" style="display: block; margin: auto;" /><img src="figure/CF.Rmd/sel%20genes-6.png" width="576" style="display: block; margin: auto;" /><img src="figure/CF.Rmd/sel%20genes-7.png" width="576" style="display: block; margin: auto;" /><img src="figure/CF.Rmd/sel%20genes-8.png" width="576" style="display: block; margin: auto;" /></p>
+</div>
+</div>
+<div id="session-info" class="section level2">
+<h2>session info</h2>
+<pre class="r"><code>sessionInfo()</code></pre>
+<pre><code>R version 4.4.0 (2024-04-24)
+Platform: x86_64-apple-darwin20
+Running under: macOS Ventura 13.7.6
+
+Matrix products: default
+BLAS:   /Library/Frameworks/R.framework/Versions/4.4-x86_64/Resources/lib/libRblas.0.dylib 
+LAPACK: /Library/Frameworks/R.framework/Versions/4.4-x86_64/Resources/lib/libRlapack.dylib;  LAPACK version 3.12.0
+
+locale:
+[1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8
+
+time zone: Europe/Zurich
+tzcode source: internal
+
+attached base packages:
+[1] stats4    stats     graphics  grDevices utils     datasets  methods   base     
+
+other attached packages:
+ [1] EnhancedVolcano_1.22.0      ggrepel_0.9.6               ggpubr_0.6.0               
+ [4] clusterProfiler_4.12.6      msigdbr_10.0.2              lubridate_1.9.4            
+ [7] forcats_1.0.0               stringr_1.5.1               dplyr_1.1.4                
+[10] purrr_1.0.4                 readr_2.1.5                 tidyr_1.3.1                
+[13] tibble_3.2.1                ggplot2_3.5.2               tidyverse_2.0.0            
+[16] biomaRt_2.60.1              RColorBrewer_1.1-3          pheatmap_1.0.12            
+[19] vsn_3.72.0                  DESeq2_1.44.0               SummarizedExperiment_1.34.0
+[22] Biobase_2.64.0              MatrixGenerics_1.16.0       matrixStats_1.5.0          
+[25] GenomicRanges_1.56.2        GenomeInfoDb_1.40.1         IRanges_2.38.1             
+[28] S4Vectors_0.42.1            BiocGenerics_0.50.0         tximeta_1.22.1             
+[31] here_1.0.1                 
+
+loaded via a namespace (and not attached):
+  [1] splines_4.4.0            later_1.4.2              BiocIO_1.14.0           
+  [4] ggplotify_0.1.2          bitops_1.0-9             filelock_1.0.3          
+  [7] R.oo_1.27.1              polyclip_1.10-7          preprocessCore_1.66.0   
+ [10] XML_3.99-0.18            lifecycle_1.0.4          httr2_1.1.2             
+ [13] rstatix_0.7.2            rprojroot_2.0.4          vroom_1.6.5             
+ [16] lattice_0.22-7           ensembldb_2.28.1         MASS_7.3-65             
+ [19] backports_1.5.0          magrittr_2.0.3           limma_3.60.6            
+ [22] sass_0.4.10              rmarkdown_2.29           jquerylib_0.1.4         
+ [25] yaml_2.3.10              httpuv_1.6.16            cowplot_1.1.3           
+ [28] DBI_1.2.3                abind_1.4-8              zlibbioc_1.50.0         
+ [31] R.utils_2.13.0           AnnotationFilter_1.28.0  ggraph_2.2.1            
+ [34] RCurl_1.98-1.17          yulab.utils_0.2.0        tweenr_2.0.3            
+ [37] rappdirs_0.3.3           git2r_0.36.2             GenomeInfoDbData_1.2.12 
+ [40] enrichplot_1.24.4        tidytree_0.4.6           codetools_0.2-20        
+ [43] DelayedArray_0.30.1      ggforce_0.4.2            DOSE_3.30.5             
+ [46] xml2_1.3.8               tidyselect_1.2.1         aplot_0.2.5             
+ [49] UCSC.utils_1.0.0         farver_2.1.2             viridis_0.6.5           
+ [52] BiocFileCache_2.12.0     GenomicAlignments_1.40.0 jsonlite_2.0.0          
+ [55] Formula_1.2-5            tidygraph_1.3.1          tools_4.4.0             
+ [58] progress_1.2.3           treeio_1.28.0            Rcpp_1.0.14             
+ [61] glue_1.8.0               gridExtra_2.3            SparseArray_1.4.8       
+ [64] xfun_0.52                qvalue_2.36.0            withr_3.0.2             
+ [67] BiocManager_1.30.25      fastmap_1.2.0            digest_0.6.37           
+ [70] gridGraphics_0.5-1       timechange_0.3.0         R6_2.6.1                
+ [73] colorspace_2.1-1         GO.db_3.19.1             RSQLite_2.3.11          
+ [76] R.methodsS3_1.8.2        utf8_1.2.5               hexbin_1.28.5           
+ [79] generics_0.1.4           data.table_1.17.2        rtracklayer_1.64.0      
+ [82] graphlayouts_1.2.2       prettyunits_1.2.0        httr_1.4.7              
+ [85] S4Arrays_1.4.1           scatterpie_0.2.4         pkgconfig_2.0.3         
+ [88] gtable_0.3.6             blob_1.2.4               workflowr_1.7.1         
+ [91] XVector_0.44.0           shadowtext_0.1.4         htmltools_0.5.8.1       
+ [94] carData_3.0-5            fgsea_1.30.0             msigdbdf_24.1.1         
+ [97] ProtGenerics_1.36.0      scales_1.4.0             png_0.1-8               
+[100] ggfun_0.1.8              knitr_1.50               rstudioapi_0.17.1       
+[103] tzdb_0.5.0               reshape2_1.4.4           rjson_0.2.23            
+[106] nlme_3.1-168             curl_6.2.2               cachem_1.1.0            
+[109] BiocVersion_3.19.1       parallel_4.4.0           AnnotationDbi_1.66.0    
+[112] restfulr_0.0.15          pillar_1.10.2            grid_4.4.0              
+[115] vctrs_0.6.5              promises_1.3.2           car_3.1-3               
+[118] dbplyr_2.5.0             tximport_1.32.0          evaluate_1.0.3          
+[121] GenomicFeatures_1.56.0   cli_3.6.5                locfit_1.5-9.12         
+[124] compiler_4.4.0           Rsamtools_2.20.0         rlang_1.1.6             
+[127] crayon_1.5.3             ggsignif_0.6.4           labeling_0.4.3          
+[130] affy_1.82.0              plyr_1.8.9               fs_1.6.6                
+[133] stringi_1.8.7            viridisLite_0.4.2        BiocParallel_1.38.0     
+[136] assertthat_0.2.1         babelgene_22.9           txdbmaker_1.0.1         
+[139] Biostrings_2.72.1        lazyeval_0.2.2           GOSemSim_2.30.2         
+[142] Matrix_1.7-3             patchwork_1.3.0          hms_1.1.3               
+[145] bit64_4.6.0-1            KEGGREST_1.44.1          statmod_1.5.0           
+[148] AnnotationHub_3.12.0     broom_1.0.8              igraph_2.1.4            
+[151] memoise_2.0.1            affyio_1.74.0            bslib_0.9.0             
+[154] ggtree_3.12.0            fastmatch_1.1-6          bit_4.6.0               
+[157] gson_0.1.0               ape_5.8-1               </code></pre>
+<pre class="r"><code>date()</code></pre>
+<pre><code>[1] &quot;Fri Jun 13 17:16:48 2025&quot;</code></pre>
+<br>
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
+<span class="glyphicon glyphicon-wrench" aria-hidden="true"></span>
+Session information
+</button>
+</p>
+<div id="workflowr-sessioninfo" class="collapse">
+<pre class="r"><code>sessionInfo()</code></pre>
+<pre><code>R version 4.4.0 (2024-04-24)
+Platform: x86_64-apple-darwin20
+Running under: macOS Ventura 13.7.6
+
+Matrix products: default
+BLAS:   /Library/Frameworks/R.framework/Versions/4.4-x86_64/Resources/lib/libRblas.0.dylib 
+LAPACK: /Library/Frameworks/R.framework/Versions/4.4-x86_64/Resources/lib/libRlapack.dylib;  LAPACK version 3.12.0
+
+locale:
+[1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8
+
+time zone: Europe/Zurich
+tzcode source: internal
+
+attached base packages:
+[1] stats4    stats     graphics  grDevices utils     datasets  methods   base     
+
+other attached packages:
+ [1] EnhancedVolcano_1.22.0      ggrepel_0.9.6               ggpubr_0.6.0               
+ [4] clusterProfiler_4.12.6      msigdbr_10.0.2              lubridate_1.9.4            
+ [7] forcats_1.0.0               stringr_1.5.1               dplyr_1.1.4                
+[10] purrr_1.0.4                 readr_2.1.5                 tidyr_1.3.1                
+[13] tibble_3.2.1                ggplot2_3.5.2               tidyverse_2.0.0            
+[16] biomaRt_2.60.1              RColorBrewer_1.1-3          pheatmap_1.0.12            
+[19] vsn_3.72.0                  DESeq2_1.44.0               SummarizedExperiment_1.34.0
+[22] Biobase_2.64.0              MatrixGenerics_1.16.0       matrixStats_1.5.0          
+[25] GenomicRanges_1.56.2        GenomeInfoDb_1.40.1         IRanges_2.38.1             
+[28] S4Vectors_0.42.1            BiocGenerics_0.50.0         tximeta_1.22.1             
+[31] here_1.0.1                 
+
+loaded via a namespace (and not attached):
+  [1] splines_4.4.0            later_1.4.2              BiocIO_1.14.0           
+  [4] ggplotify_0.1.2          bitops_1.0-9             filelock_1.0.3          
+  [7] R.oo_1.27.1              polyclip_1.10-7          preprocessCore_1.66.0   
+ [10] XML_3.99-0.18            lifecycle_1.0.4          httr2_1.1.2             
+ [13] rstatix_0.7.2            rprojroot_2.0.4          vroom_1.6.5             
+ [16] lattice_0.22-7           ensembldb_2.28.1         MASS_7.3-65             
+ [19] backports_1.5.0          magrittr_2.0.3           limma_3.60.6            
+ [22] sass_0.4.10              rmarkdown_2.29           jquerylib_0.1.4         
+ [25] yaml_2.3.10              httpuv_1.6.16            cowplot_1.1.3           
+ [28] DBI_1.2.3                abind_1.4-8              zlibbioc_1.50.0         
+ [31] R.utils_2.13.0           AnnotationFilter_1.28.0  ggraph_2.2.1            
+ [34] RCurl_1.98-1.17          yulab.utils_0.2.0        tweenr_2.0.3            
+ [37] rappdirs_0.3.3           git2r_0.36.2             GenomeInfoDbData_1.2.12 
+ [40] enrichplot_1.24.4        tidytree_0.4.6           codetools_0.2-20        
+ [43] DelayedArray_0.30.1      ggforce_0.4.2            DOSE_3.30.5             
+ [46] xml2_1.3.8               tidyselect_1.2.1         aplot_0.2.5             
+ [49] UCSC.utils_1.0.0         farver_2.1.2             viridis_0.6.5           
+ [52] BiocFileCache_2.12.0     GenomicAlignments_1.40.0 jsonlite_2.0.0          
+ [55] Formula_1.2-5            tidygraph_1.3.1          tools_4.4.0             
+ [58] progress_1.2.3           treeio_1.28.0            Rcpp_1.0.14             
+ [61] glue_1.8.0               gridExtra_2.3            SparseArray_1.4.8       
+ [64] xfun_0.52                qvalue_2.36.0            withr_3.0.2             
+ [67] BiocManager_1.30.25      fastmap_1.2.0            digest_0.6.37           
+ [70] gridGraphics_0.5-1       timechange_0.3.0         R6_2.6.1                
+ [73] colorspace_2.1-1         GO.db_3.19.1             RSQLite_2.3.11          
+ [76] R.methodsS3_1.8.2        utf8_1.2.5               hexbin_1.28.5           
+ [79] generics_0.1.4           data.table_1.17.2        rtracklayer_1.64.0      
+ [82] graphlayouts_1.2.2       prettyunits_1.2.0        httr_1.4.7              
+ [85] S4Arrays_1.4.1           scatterpie_0.2.4         pkgconfig_2.0.3         
+ [88] gtable_0.3.6             blob_1.2.4               workflowr_1.7.1         
+ [91] XVector_0.44.0           shadowtext_0.1.4         htmltools_0.5.8.1       
+ [94] carData_3.0-5            fgsea_1.30.0             msigdbdf_24.1.1         
+ [97] ProtGenerics_1.36.0      scales_1.4.0             png_0.1-8               
+[100] ggfun_0.1.8              knitr_1.50               rstudioapi_0.17.1       
+[103] tzdb_0.5.0               reshape2_1.4.4           rjson_0.2.23            
+[106] nlme_3.1-168             curl_6.2.2               cachem_1.1.0            
+[109] BiocVersion_3.19.1       parallel_4.4.0           AnnotationDbi_1.66.0    
+[112] restfulr_0.0.15          pillar_1.10.2            grid_4.4.0              
+[115] vctrs_0.6.5              promises_1.3.2           car_3.1-3               
+[118] dbplyr_2.5.0             tximport_1.32.0          evaluate_1.0.3          
+[121] GenomicFeatures_1.56.0   cli_3.6.5                locfit_1.5-9.12         
+[124] compiler_4.4.0           Rsamtools_2.20.0         rlang_1.1.6             
+[127] crayon_1.5.3             ggsignif_0.6.4           labeling_0.4.3          
+[130] affy_1.82.0              plyr_1.8.9               fs_1.6.6                
+[133] stringi_1.8.7            viridisLite_0.4.2        BiocParallel_1.38.0     
+[136] assertthat_0.2.1         babelgene_22.9           txdbmaker_1.0.1         
+[139] Biostrings_2.72.1        lazyeval_0.2.2           GOSemSim_2.30.2         
+[142] Matrix_1.7-3             patchwork_1.3.0          hms_1.1.3               
+[145] bit64_4.6.0-1            KEGGREST_1.44.1          statmod_1.5.0           
+[148] AnnotationHub_3.12.0     broom_1.0.8              igraph_2.1.4            
+[151] memoise_2.0.1            affyio_1.74.0            bslib_0.9.0             
+[154] ggtree_3.12.0            fastmatch_1.1-6          bit_4.6.0               
+[157] gson_0.1.0               ape_5.8-1               </code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+
+<!-- Adjust MathJax settings so that all math formulae are shown using
+TeX fonts only; see
+https://docs.mathjax.org/en/latest/web/configuration.html. This will make
+the presentation more consistent at the cost of the webpage sometimes
+taking slightly longer to load. Note that this only works because the
+footer is added to webpages before the MathJax javascript. -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    "HTML-CSS": { availableFonts: ["TeX"] }
+  });
+</script>
+
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+
+<script>
+$(document).ready(function ()  {
+
+    // temporarily add toc-ignore selector to headers for the consistency with Pandoc
+    $('.unlisted.unnumbered').addClass('toc-ignore')
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
