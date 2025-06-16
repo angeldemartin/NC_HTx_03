@@ -101,7 +101,7 @@ saveRDS(gse, file=paste0(basedir, "gse_stimhiPS.rds"))
 gse <- readRDS(file=paste0(basedir, "gse_stimhiPS.rds"))
 ```
 
-# sample distance
+## sample distance
 ### construct a DESeqDataSet stim
 ```{r construct DESeqDataSet object stim2}
 ##construct a DESeqDataSet object
